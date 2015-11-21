@@ -2,7 +2,6 @@ DROP TABLE IF EXISTS restaurante CASCADE;
 CREATE TABLE restaurante
 (
     restaurante_nombre          VARCHAR(256),
-    restaurante_cantidad_mesas  INT NOT NULL,
     PRIMARY KEY (restaurante_nombre)
 );
 
@@ -16,4 +15,21 @@ CREATE TABLE mesa
     PRIMARY KEY (mesa_numero, mesa_restaurante_nombre),
     FOREIGN KEY mesa (mesa_restaurante) REFERENCES restaurante (restaurante_nombre)
 );
+
+INSERT INTO restaurante VALUES ('RESTAURANTE 1');
+INSERT INTO restaurante VALUES ('RESTAURANTE 2');
+INSERT INTO restaurante VALUES ('RESTAURANTE 3');
+INSERT INTO restaurante VALUES ('RESTAURANTE 4');
+INSERT INTO restaurante VALUES ('RESTAURANTE 5');
+
+INSERT INTO mesa VALUES (1, FALSE, 'LIBRE', 'RESTAURANTE 1');
+INSERT INTO mesa VALUES (2, FALSE, 'LIBRE', 'RESTAURANTE 1');
+INSERT INTO mesa VALUES (3, FALSE, 'LIBRE', 'RESTAURANTE 1');
+INSERT INTO mesa VALUES (4, FALSE, 'LIBRE', 'RESTAURANTE 1');
+INSERT INTO mesa VALUES (5, FALSE, 'LIBRE', 'RESTAURANTE 1');
+INSERT INTO mesa VALUES (6, FALSE, 'LIBRE', 'RESTAURANTE 1');
+INSERT INTO mesa VALUES (7, FALSE, 'LIBRE', 'RESTAURANTE 1');
+INSERT INTO mesa VALUES (8, FALSE, 'LIBRE', 'RESTAURANTE 1');
+INSERT INTO mesa VALUES (9, TRUE, 'LIBRE', 'RESTAURANTE 1');
+INSERT INTO mesa VALUES (10, TRUE, 'LIBRE', 'RESTAURANTE 1');
 
