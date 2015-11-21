@@ -10,6 +10,8 @@ import Modelo.Consumicion;
 import Modelo.ConsumicionDAO;
 import Modelo.Mesa;
 import Modelo.MesaDAO;
+import Modelo.Pedido;
+import Modelo.PedidoDAO;
 import Modelo.Restaurante;
 import Modelo.RestauranteDAO;
 import Vista.RealizarPedido;
@@ -38,6 +40,7 @@ public class RealizarPedido_Eventos
     private RestauranteDAO restauranteDAO;
     private MesaDAO mesaDAO;
     private ConsumicionDAO consumicionDAO;
+    private PedidoDAO pedidoDAO;
     
     private String servidorIP;
     private int servidorPuerto;    
@@ -54,6 +57,7 @@ public class RealizarPedido_Eventos
         this.restauranteDAO = new RestauranteDAO();
         this.mesaDAO = new MesaDAO();
         this.consumicionDAO = new ConsumicionDAO();
+        this.pedidoDAO = new PedidoDAO();
         
         realizarPedido.bConectar.addActionListener(
                 new ActionListener()
@@ -84,6 +88,28 @@ public class RealizarPedido_Eventos
                     public void actionPerformed(ActionEvent ae) 
                     {
                         agregarConsumicion();
+                    }
+                }
+        );
+        
+        realizarPedido.bCancelar.addActionListener(
+                new ActionListener()
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent ae) 
+                    {
+                        cancelarPedido();
+                    }
+                }
+        );
+        
+        realizarPedido.bRealizarPedido.addActionListener(
+                new ActionListener()
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent ae) 
+                    {
+                        realizarPedido();
                     }
                 }
         );
@@ -149,7 +175,7 @@ public class RealizarPedido_Eventos
         {
             String[] lista = new String[this.realizarPedido.lPedido.getModel().getSize() + 1];
             
-            for (int i = 0; i < this.realizarPedido.lPedido.getModel().getSize() + 1; i++)
+            for (int i = 0; i < this.realizarPedido.lPedido.getModel().getSize(); i++)
             {
                 lista[i] = (String) this.realizarPedido.lPedido.getModel().getElementAt(i);
             }
@@ -159,6 +185,45 @@ public class RealizarPedido_Eventos
             this.realizarPedido.lPedido.setListData(lista);
         }
     }
+    
+    public void cancelarPedido()
+    {
+        habilitarTomarPedido(false);
+        
+        this.realizarPedido.tfConsumicion.setText("");
+        this.realizarPedido.lPedido.setListData(new Object[0]);
+    }
+    
+    public void realizarPedido()
+    {
+        int mesa = (Integer) this.realizarPedido.cbMesa.getSelectedItem();
+        String nombre = (String) this.realizarPedido.cbRestaurante.getSelectedItem();
+        
+        Pedido pedido = new Pedido(mesa, nombre);
+        
+        boolean resultado = this.pedidoDAO.insetarPedido(pedido);
+        
+        if (resultado)
+        {
+            
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     // conexion con el servidor
     public void conectar()
