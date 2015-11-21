@@ -238,6 +238,7 @@ public class ReservarMesa extends javax.swing.JFrame
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JButton bCancelar;
     public javax.swing.JButton bDisponibilidad;
