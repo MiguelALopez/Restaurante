@@ -1,14 +1,14 @@
 DROP TABLE IF EXISTS restaurante CASCADE;
 CREATE TABLE restaurante
 (
-    restaurante_nombre          VARCHAR(256),
+    restaurante_nombre          VARCHAR(256)    NOT NULL,
     PRIMARY KEY (restaurante_nombre)
 );
 
 DROP TABLE IF EXISTS mesa CASCADE;
 CREATE TABLE mesa
 (
-    mesa_numero             INT,
+    mesa_numero             INT             NOT NULL,
     mesa_capacidad          INT             NOT NULL,
     mesa_fumador            BOOLEAN         NOT NULL,
     mesa_estado             VARCHAR(128)    NOT NULL,
@@ -20,20 +20,20 @@ CREATE TABLE mesa
 DROP TABLE IF EXISTS reserva CASCADE;
 CREATE TABLE reserva
 (
-    reserva_fecha                   VARCHAR(64),
+    reserva_fecha                   VARCHAR(64)     NOT NULL,
     reserva_hora                    VARCHAR(8)      NOT NULL,
     reserva_nombre                  VARCHAR(128)    NOT NULL,
     mesa_numero                     INT             NOT NULL,
     restaurante_nombre              VARCHAR(256)    NOT NULL,
     PRIMARY KEY (reserva_fecha, mesa_numero, restaurante_nombre),
-    FOREIGN KEY (mesa_numero, restaurante_nombre) REFERENCES mesa (mesa_numero, mesa_restaurante_nombre)
+    FOREIGN KEY (mesa_numero, restaurante_nombre) REFERENCES mesa (mesa_numero, restaurante_nombre)
 );
 
 DROP TABLE IF EXISTS consumicion CASCADE;
 CREATE TABLE consumicion
 (
-    consumicion_id                  VARCHAR(32),
-    consumicion_nombre              VARCHAR(128)     NOT NULL,
+    consumicion_id                  VARCHAR(32)     NOT NULL,
+    consumicion_nombre              VARCHAR(128)    NOT NULL,
     restaurante_nombre              VARCHAR(256)    NOT NULL,
     PRIMARY KEY (consumicion_id, restaurante_nombre),
     FOREIGN KEY (restaurante_nombre) REFERENCES restaurante (restaurante_nombre)
@@ -42,7 +42,7 @@ CREATE TABLE consumicion
 DROP TABLE IF EXISTS ingrediente CASCADE;
 CREATE TABLE ingrediente
 (
-    ingrediente_id                  VARCHAR(32),
+    ingrediente_id                  VARCHAR(32)     NOT NULL,
     ingrediente_nombre              VARCHAR(128)    NOT NULL,
     ingrediente_cantidad            INT             NOT NULL,
     restaurante_nombre              VARCHAR(256)    NOT NULL,
@@ -50,15 +50,37 @@ CREATE TABLE ingrediente
     FOREIGN KEY (restaurante_nombre) REFERENCES restaurante (restaurante_nombre)
 );
 
+DROP TABLE IF EXISTS pedido CASCADE;
+CREATE TABLE pedido
+(
+    pedido_fecha                    VARCHAR(32)     NOT NULL,
+    mesa_numero                     INT             NOT NULL,
+    restaurante_nombre              VARCHAR(256)    NOT NULL,
+    PRIMARY KEY (pedido_fecha, mesa_numero, restaurante_nombre),
+    FOREIGN KEY (mesa_numero, restaurante_nombre) REFERENCES mesa (consumicion_id, restaurante_nombre)
+);
+
 DROP TABLE IF EXISTS consumicion_ingrediente CASCADE;
 CREATE TABLE consumicion_ingrediente
 (
-    consumicion_id                  VARCHAR(32),
-    ingrediente_id                  VARCHAR(32),
-    restaurante_nombre              VARCHAR(256),
+    consumicion_id                  VARCHAR(32)     NOT NULL,
+    ingrediente_id                  VARCHAR(32)     NOT NULL,
+    restaurante_nombre              VARCHAR(256)    NOT NULL,
     PRIMARY KEY (consumicion_id, ingrediente_id, restaurante_nombre),
     FOREIGN KEY (consumicion_id, restaurante_nombre) REFERENCES consumicion (consumicion_id, restaurante_nombre),
     FOREIGN KEY (ingrediente_id, restaurante_nombre) REFERENCES ingrediente (ingrediente_id, restaurante_nombre)
+);
+
+DROP TABLE IF EXISTS pedido_consumicion CASCADE;
+CREATE TABLE pedido_consumicion
+(
+    pedido_fecha                    VARCHAR(32)     NOT NULL,
+    mesa_numero                     INT             NOT NULL,
+    restaurante_nombre              VARCHAR(256)    NOT NULL,
+    consumicion_id                  VARCHAR(32)     NOT NULL,
+    PRIMARY KEY (pedido_fecha, mesa_numero, restaurante_nombre, consumicion_id),
+    FOREIGN KEY (pedido_fecha, mesa_numero, restaurante_nombre) REFERENCES pedido (pedido_fecha, mesa_numero, restaurante_nombre),
+    FOREIGN KEY (consumicion_id, restaurante_nombre) REFERENCES consumicion (consumicion_id, restaurante_nombre)
 );
 
 INSERT INTO restaurante VALUES ('RESTAURANTE 1');
