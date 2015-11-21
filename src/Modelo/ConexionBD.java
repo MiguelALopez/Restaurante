@@ -18,9 +18,9 @@ public class ConexionBD
      */
     public ConexionBD()
     {
-        url = "jdbc:postgresql://ec2-54-83-199-54.compute-1.amazonaws.com:5432/d577ndp80b4mp6?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory";
-        user = "cuvlvipagmgsyn";
-        password = "SCSMg5aCWygaSahA-ySC0Y2wVr";
+        url = "jdbc:postgresql://ec2-54-225-192-128.compute-1.amazonaws.com:5432/d38k4fcdbvhfsv?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory";
+        user = "gidkgcykrfjbmd";
+        password = "W7UIzwBb8FlsA3JAz0rdHrYj0e";
     }
     
     /**
