@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS mesa CASCADE;
 CREATE TABLE mesa
 (
     mesa_numero             INT,
+    mesa_capacidad          INT             NOT NULL,
     mesa_fumador            BOOLEAN         NOT NULL,
     mesa_estado             VARCHAR(128)    NOT NULL,
     mesa_restaurante_nombre VARCHAR(256)    NOT NULL,
