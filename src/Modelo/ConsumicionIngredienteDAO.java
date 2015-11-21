@@ -9,6 +9,7 @@ package Modelo;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,17 +17,17 @@ import java.util.logging.Logger;
  *
  * @author Camilo Ruiz Casanova
  */
-public class ConsumicionDAO 
+public class ConsumicionIngredienteDAO 
 {
-    ConexionBD conexionBD = new ConexionBD();
+    private ConexionBD conexionBD = new ConexionBD();
     
-    public Consumicion consultarConsumicion(String id, String nombre)
+    public ArrayList<ConsumicionIngrediente> consultarConsumicionIngredientes(String id, String nombre)
     {
         conexionBD.conectar();
         
-        Consumicion consumicion = null;
+        ArrayList<ConsumicionIngrediente> lista = null;
         
-        String query = "SELECT * FROM consumicion "
+        String query = "SELECT * FROM consumicion_ingrediente "
                 + "WHERE consumicion_id = '" + id + "' AND restaurante_nombre = '" + nombre + "';";
         
         try
@@ -34,19 +35,21 @@ public class ConsumicionDAO
             Statement st = conexionBD.conexion.createStatement();
             ResultSet tabla = st.executeQuery(query);
             
-            if (tabla.next())
+            lista = new ArrayList();
+            
+            while (tabla.next())
             {
-                consumicion = new Consumicion(tabla.getString(1), 
-                        tabla.getString(2), tabla.getString(3));                
-            }
+                lista.add(new ConsumicionIngrediente(tabla.getInt(1), tabla.getString(2),
+                        tabla.getString(3), tabla.getString(4)));
+            }        
         } 
         catch (SQLException ex) 
         {
-            Logger.getLogger(ConsumicionDAO.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ConsumicionIngredienteDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        conexionBD.cerrarConexion();
+        conexionBD.cerrarConexion();        
         
-        return consumicion;
-    }  
+        return lista;
+    }
 }

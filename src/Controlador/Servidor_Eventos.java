@@ -15,6 +15,7 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,7 +31,7 @@ public class Servidor_Eventos implements Runnable
     private MulticastSocket multicastSocket;
     private InetAddress inetAddress;
     private Thread thread;
-    private ServidorHilo cliente;
+    private ArrayList<ServidorHilo> clientes;
     
     private final int MAX_CONEXIONES;
     public int numConexiones;
@@ -39,6 +40,7 @@ public class Servidor_Eventos implements Runnable
     
     public Servidor_Eventos(final Servidor servidor)
     {
+        this.clientes = new ArrayList();
         this.MAX_CONEXIONES = 5;
         this.port = 12345;
         
@@ -104,12 +106,13 @@ public class Servidor_Eventos implements Runnable
     public void agregarCliente(Socket socket)
     { 
         this.servidor.taNotificaciones.append("\nCliente aceptado: " + socket);
-        cliente = new ServidorHilo(this, socket);
+        ServidorHilo cliente = new ServidorHilo(this, socket);
+        this.clientes.add(new ServidorHilo(cliente));
         
         try 
         {
             cliente.open();
-            cliente.start();            
+            cliente.start();
         } 
         catch (IOException ex) 
         {

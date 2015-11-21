@@ -33,6 +33,13 @@ public class ServidorHilo extends Thread
         this.socket = socket;  
         ID = socket.getPort();
     }
+    
+    public ServidorHilo(ServidorHilo s)
+    {
+        this.socket = s.socket;
+        this.servidor_Eventos = s.servidor_Eventos;
+        this.ID = s.ID;
+    }
 
     /**
      * se procesa la informacion recibida del cliente
@@ -55,6 +62,10 @@ public class ServidorHilo extends Thread
                     servidor_Eventos.escribirMensaje("\nCliente "+ ID + " desconectado");
                     servidor_Eventos.numConexiones--;
                     break;
+                }
+                else if (input.equals("COCINA|PEDIDO"))
+                {
+                    this.servidor_Eventos.escribirMensaje(input);
                 }
             } 
             catch (IOException ex) 

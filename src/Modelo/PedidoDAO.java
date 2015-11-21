@@ -24,7 +24,7 @@ public class PedidoDAO
         conexionBD.conectar();
         boolean exito = false;
         
-        String query = "INSERT INTO pedido (pedido_fecha, mesa_numero, restaurante_nombre VALUES (?, ?, ?);";
+        String query = "INSERT INTO pedido (pedido_fecha, mesa_numero, restaurante_nombre) VALUES (?, ?, ?);";
         
         try
         {

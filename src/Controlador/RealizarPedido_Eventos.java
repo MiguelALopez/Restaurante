@@ -8,6 +8,10 @@ package Controlador;
 
 import Modelo.Consumicion;
 import Modelo.ConsumicionDAO;
+import Modelo.ConsumicionIngrediente;
+import Modelo.ConsumicionIngredienteDAO;
+import Modelo.Ingrediente;
+import Modelo.IngredienteDAO;
 import Modelo.Mesa;
 import Modelo.MesaDAO;
 import Modelo.Pedido;
@@ -29,6 +33,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -40,7 +45,9 @@ public class RealizarPedido_Eventos
     private RestauranteDAO restauranteDAO;
     private MesaDAO mesaDAO;
     private ConsumicionDAO consumicionDAO;
+    private IngredienteDAO ingredienteDAO;
     private PedidoDAO pedidoDAO;
+    private ConsumicionIngredienteDAO consumicionIngredienteDAO;
     
     private String servidorIP;
     private int servidorPuerto;    
@@ -57,7 +64,9 @@ public class RealizarPedido_Eventos
         this.restauranteDAO = new RestauranteDAO();
         this.mesaDAO = new MesaDAO();
         this.consumicionDAO = new ConsumicionDAO();
+        this.ingredienteDAO = new IngredienteDAO();
         this.pedidoDAO = new PedidoDAO();
+        this.consumicionIngredienteDAO = new ConsumicionIngredienteDAO();
         
         realizarPedido.bConectar.addActionListener(
                 new ActionListener()
@@ -169,21 +178,55 @@ public class RealizarPedido_Eventos
         String id = this.realizarPedido.tfConsumicion.getText();
         String nombre = (String) this.realizarPedido.cbRestaurante.getSelectedItem();
         
-        Consumicion consumicion = this.consumicionDAO.consultarConsumicion(id, nombre);       
+        Consumicion consumicion = this.consumicionDAO.consultarConsumicion(id, nombre);
         
         if (consumicion != null)
         {
-            String[] lista = new String[this.realizarPedido.lPedido.getModel().getSize() + 1];
+            boolean suficiente = verificarIngredientes(consumicion);
             
-            for (int i = 0; i < this.realizarPedido.lPedido.getModel().getSize(); i++)
+            if (suficiente)
             {
-                lista[i] = (String) this.realizarPedido.lPedido.getModel().getElementAt(i);
+                String[] lista = new String[this.realizarPedido.lPedido.getModel().getSize() + 1];
+                        
+                for (int i = 0; i < this.realizarPedido.lPedido.getModel().getSize(); i++)
+                {
+                    lista[i] = (String) this.realizarPedido.lPedido.getModel().getElementAt(i);
+                }
+
+                lista[lista.length - 1] = consumicion.getId();
+
+                this.realizarPedido.lPedido.setListData(lista);
             }
-            
-            lista[lista.length - 1] = consumicion.getId();
-            
-            this.realizarPedido.lPedido.setListData(lista);
+            else
+            {
+                String mensaje = "No hay suficientes ingredientes para: " + consumicion.getId() + "-" + consumicion.getNombre();
+                JOptionPane.showMessageDialog(realizarPedido, mensaje, "Advertencia", JOptionPane.WARNING_MESSAGE);
+            }
         }
+    }
+    
+    public boolean verificarIngredientes(Consumicion consumicion)
+    {
+        boolean resultado = true;
+        
+        ArrayList<ConsumicionIngrediente> lista = this.consumicionIngredienteDAO.consultarConsumicionIngredientes(consumicion.getId(), consumicion.getRestaurante_nombre());
+        
+        if (lista != null)
+        {
+            for (int i = 0; i < lista.size(); i++)
+            {
+                Ingrediente ing = this.ingredienteDAO.consultarIngrediente(lista.get(i).getIngrediente_id(), lista.get(i).getRestaurante_nombre());
+                
+                if (ing.getCantidad() - lista.get(i).getCantidad() < 0)
+                {
+                    resultado = false;
+                    
+                    // aqui codigo para avisar al almacen para reponer ingrediente
+                }
+            }
+        }
+        
+        return resultado;
     }
     
     public void cancelarPedido()
@@ -199,13 +242,28 @@ public class RealizarPedido_Eventos
         int mesa = (Integer) this.realizarPedido.cbMesa.getSelectedItem();
         String nombre = (String) this.realizarPedido.cbRestaurante.getSelectedItem();
         
+        
+        
         Pedido pedido = new Pedido(mesa, nombre);
         
         boolean resultado = this.pedidoDAO.insetarPedido(pedido);
         
         if (resultado)
         {
+            try 
+            {
+                streamOut.writeUTF("COCINA|PEDIDO");
+            }
+            catch (IOException ex) 
+            {
+                Logger.getLogger(RealizarPedido_Eventos.class.getName()).log(Level.SEVERE, null, ex);
+            }
             
+            JOptionPane.showMessageDialog(realizarPedido, "Pedido realizado exitosamente.", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
+        }
+        else
+        {
+            JOptionPane.showMessageDialog(realizarPedido, "Error al realizar el Pedido.", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
         }
     }
     

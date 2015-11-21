@@ -63,9 +63,10 @@ CREATE TABLE pedido
 DROP TABLE IF EXISTS consumicion_ingrediente CASCADE;
 CREATE TABLE consumicion_ingrediente
 (
-    consumicion_id                  VARCHAR(32)     NOT NULL,
-    ingrediente_id                  VARCHAR(32)     NOT NULL,
-    restaurante_nombre              VARCHAR(256)    NOT NULL,
+    consumicion_ingrediente_cantidad    INT             NOT NULL,
+    consumicion_id                      VARCHAR(32)     NOT NULL,
+    ingrediente_id                      VARCHAR(32)     NOT NULL,
+    restaurante_nombre                  VARCHAR(256)    NOT NULL,
     PRIMARY KEY (consumicion_id, ingrediente_id, restaurante_nombre),
     FOREIGN KEY (consumicion_id, restaurante_nombre) REFERENCES consumicion (consumicion_id, restaurante_nombre),
     FOREIGN KEY (ingrediente_id, restaurante_nombre) REFERENCES ingrediente (ingrediente_id, restaurante_nombre)
@@ -109,7 +110,25 @@ INSERT INTO consumicion VALUES ('1004', 'ENSALADA', 'RESTAURANTE 1');
 INSERT INTO ingrediente VALUES ('1', 'TOMATE', 20, 'RESTAURANTE 1');
 INSERT INTO ingrediente VALUES ('2', 'LECHUGA', 10, 'RESTAURANTE 1');
 INSERT INTO ingrediente VALUES ('3', 'CEBOLLA', 15, 'RESTAURANTE 1');
-INSERT INTO ingrediente VALUES ('4', 'CARNE DE RES', 50, 'RESTAURANTE 1');
+INSERT INTO ingrediente VALUES ('4', 'CARNE DE RES', 0, 'RESTAURANTE 1');
 INSERT INTO ingrediente VALUES ('5', 'CARNE DE CERDO', 30, 'RESTAURANTE 1');
 INSERT INTO ingrediente VALUES ('6', 'ACEITE', 80, 'RESTAURANTE 1');
 INSERT INTO ingrediente VALUES ('7', 'SAL', 40, 'RESTAURANTE 1');
+
+INSERT INTO consumicion_ingrediente VALUES (1, '1000', '1', 'RESTAURANTE 1');
+INSERT INTO consumicion_ingrediente VALUES (1, '1000', '2', 'RESTAURANTE 1');
+INSERT INTO consumicion_ingrediente VALUES (1, '1000', '3', 'RESTAURANTE 1');
+INSERT INTO consumicion_ingrediente VALUES (1, '1000', '4', 'RESTAURANTE 1');
+
+INSERT INTO consumicion_ingrediente VALUES (1, '1001', '1', 'RESTAURANTE 1');
+INSERT INTO consumicion_ingrediente VALUES (1, '1001', '2', 'RESTAURANTE 1');
+INSERT INTO consumicion_ingrediente VALUES (1, '1001', '3', 'RESTAURANTE 1');
+INSERT INTO consumicion_ingrediente VALUES (1, '1001', '5', 'RESTAURANTE 1');
+
+INSERT INTO consumicion_ingrediente VALUES (1, '1002', '4', 'RESTAURANTE 1');
+
+INSERT INTO consumicion_ingrediente VALUES (1, '1003', '5', 'RESTAURANTE 1');
+
+INSERT INTO consumicion_ingrediente VALUES (1, '1004', '1', 'RESTAURANTE 1');
+INSERT INTO consumicion_ingrediente VALUES (1, '1004', '2', 'RESTAURANTE 1');
+INSERT INTO consumicion_ingrediente VALUES (1, '1004', '3', 'RESTAURANTE 1');

@@ -16,18 +16,18 @@ import java.util.logging.Logger;
  *
  * @author Camilo Ruiz Casanova
  */
-public class ConsumicionDAO 
+public class IngredienteDAO 
 {
     ConexionBD conexionBD = new ConexionBD();
     
-    public Consumicion consultarConsumicion(String id, String nombre)
+    public Ingrediente consultarIngrediente(String id, String nombre)
     {
         conexionBD.conectar();
         
-        Consumicion consumicion = null;
+        Ingrediente ingrediente = null;
         
-        String query = "SELECT * FROM consumicion "
-                + "WHERE consumicion_id = '" + id + "' AND restaurante_nombre = '" + nombre + "';";
+        String query = "SELECT * FROM ingrediente "
+                + "WHERE ingrediente_id = '" + id + "' AND restaurante_nombre = '" + nombre + "';";
         
         try
         {
@@ -36,17 +36,18 @@ public class ConsumicionDAO
             
             if (tabla.next())
             {
-                consumicion = new Consumicion(tabla.getString(1), 
-                        tabla.getString(2), tabla.getString(3));                
+                ingrediente = new Ingrediente(tabla.getString(1), 
+                        tabla.getString(2), tabla.getInt(3),
+                        tabla.getString(4));                
             }
         } 
         catch (SQLException ex) 
         {
-            Logger.getLogger(ConsumicionDAO.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(IngredienteDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         conexionBD.cerrarConexion();
         
-        return consumicion;
-    }  
+        return ingrediente;
+    }
 }
