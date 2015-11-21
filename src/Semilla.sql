@@ -13,7 +13,19 @@ CREATE TABLE mesa
     mesa_estado             VARCHAR(128)    NOT NULL,
     mesa_restaurante_nombre VARCHAR(256)    NOT NULL,
     PRIMARY KEY (mesa_numero, mesa_restaurante_nombre),
-    FOREIGN KEY mesa (mesa_restaurante) REFERENCES restaurante (restaurante_nombre)
+    FOREIGN KEY mesa (mesa_restaurante_nombre) REFERENCES restaurante (restaurante_nombre)
+);
+
+DROP TABLE IF EXISTS reserva CASCADE;
+CREATE TABLE reserva
+(
+    reserva_fecha                   VARCHAR(64),
+    reserva_hora                    VARCHAR(8)      NOT NULL,
+    reserva_nombre                  VARCHAR(128)    NOT NULL,
+    reserva_mesa_numero             INT             NOT NULL,
+    reserva_mesa_restaurante_nombre VARCHAR(256)    NOT NULL,
+    PRIMARY KEY (reserva_fecha, reserva_mesa_numero, reserva_mesa_restaurante_nombre),
+    FOREIGN KEY reserva (reserva_mesa_numero, reserva_mesa_restaurante_nombre) REFERENCES mesa (mesa_numero, mesa_restaurante_nombre)
 );
 
 INSERT INTO restaurante VALUES ('RESTAURANTE 1');
