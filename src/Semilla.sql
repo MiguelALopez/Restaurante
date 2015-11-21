@@ -57,7 +57,7 @@ CREATE TABLE pedido
     mesa_numero                     INT             NOT NULL,
     restaurante_nombre              VARCHAR(256)    NOT NULL,
     PRIMARY KEY (pedido_fecha, mesa_numero, restaurante_nombre),
-    FOREIGN KEY (mesa_numero, restaurante_nombre) REFERENCES mesa (consumicion_id, restaurante_nombre)
+    FOREIGN KEY (mesa_numero, restaurante_nombre) REFERENCES mesa (mesa_numero, restaurante_nombre)
 );
 
 DROP TABLE IF EXISTS consumicion_ingrediente CASCADE;
@@ -99,6 +99,12 @@ INSERT INTO mesa VALUES (7, 15, FALSE, 'LIBRE', 'RESTAURANTE 1');
 INSERT INTO mesa VALUES (8, 15, FALSE, 'LIBRE', 'RESTAURANTE 1');
 INSERT INTO mesa VALUES (9, 15, TRUE, 'LIBRE', 'RESTAURANTE 1');
 INSERT INTO mesa VALUES (10, 20, TRUE, 'LIBRE', 'RESTAURANTE 1');
+
+INSERT INTO consumicion VALUES ('1000', 'HAMBURGUESA RES', 'RESTAURANTE 1');
+INSERT INTO consumicion VALUES ('1001', 'HAMBURGUESA CERDO', 'RESTAURANTE 1');
+INSERT INTO consumicion VALUES ('1002', 'CARNE ASADA', 'RESTAURANTE 1');
+INSERT INTO consumicion VALUES ('1003', 'CERDO ASADO', 'RESTAURANTE 1');
+INSERT INTO consumicion VALUES ('1004', 'ENSALADA', 'RESTAURANTE 1');
 
 INSERT INTO ingrediente VALUES ('1', 'TOMATE', 20, 'RESTAURANTE 1');
 INSERT INTO ingrediente VALUES ('2', 'LECHUGA', 10, 'RESTAURANTE 1');
