@@ -18,9 +18,6 @@ public class ConexionBD
      */
     public ConexionBD()
     {
-        /*url = "jdbc:postgresql://localhost:5432/proyectods";
-        user = "prueba";
-        password = "123456";*/
         url = "jdbc:postgresql://ec2-54-83-199-54.compute-1.amazonaws.com:5432/d577ndp80b4mp6?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory";
         user = "cuvlvipagmgsyn";
         password = "SCSMg5aCWygaSahA-ySC0Y2wVr";
