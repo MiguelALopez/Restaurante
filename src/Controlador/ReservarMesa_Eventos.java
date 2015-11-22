@@ -10,6 +10,9 @@ import Modelo.RestauranteDAO;
 import Vista.ReservarMesa;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
@@ -48,7 +51,7 @@ public final class ReservarMesa_Eventos
         this.reservarMesa.bReservar.addActionListener(
                 new ActionListener() {
                     @Override
-                    public void actionPerformed(ActionEvent e) {
+                    public void actionPerformed(ActionEvent e) {                     
                         if (reservarMesa.lRestaurantes.getSelectedValue() == null) {
                             JOptionPane.showMessageDialog(null, "Seleccione un restaurante por favor");
                         }else if(reservarMesa.comboItem.getItemCount() == 0){
@@ -62,11 +65,16 @@ public final class ReservarMesa_Eventos
                             int mesa_numero = Integer.parseInt(reservarMesa.comboItem.getSelectedItem().toString());
                             String restaurante_nombre = reservarMesa.lRestaurantes.getSelectedValue().toString();
                             
-                            crearReserva(fecha, hora, nombre, numero_personas, mesa_numero, restaurante_nombre);
+                            boolean exito = crearReserva(fecha, hora, nombre, numero_personas, mesa_numero, restaurante_nombre);
+                            if (exito) {
+                                JOptionPane.showMessageDialog(null, "Exito al crear reserva");
+                            }else{
+                                JOptionPane.showMessageDialog(null, "Error al crear reserva");
+                            }
                         }
                     }
                 });
-        
+
         reservarMesa.setVisible(true);
         reservarMesa.setLocationRelativeTo(null);
     }
@@ -82,9 +90,17 @@ public final class ReservarMesa_Eventos
     
     public void disponibilidadMesas(String restaurante, String fecha){
         ArrayList<Mesa> mesas = mesaDAO.consularMesasDisponibles(restaurante, fecha);
+        //int n = (int) (Math.pow(mesas.size(), 0.5) +1);
+        int n = (mesas.size() / 2) + 1;
+        reservarMesa.gridLayoutMesas.setColumns(2);
+        reservarMesa.gridLayoutMesas.setRows(n);
+        reservarMesa.gridLayoutMesas.setHgap(10);
+        reservarMesa.gridLayoutMesas.setVgap(10);
         reservarMesa.comboItem.removeAllItems();
         for (int i = 0; i < mesas.size(); i++) {
-            System.out.println(mesas.get(i).getNumero());
+            reservarMesa.panelMesas.add(reservarMesa.generaTexto(mesas.get(i).getNumero(),
+                    mesas.get(i).isFumador(),
+                    mesas.get(i).getCapacidad()));
             reservarMesa.comboItem.addItem(mesas.get(i).getNumero());
         }
     }

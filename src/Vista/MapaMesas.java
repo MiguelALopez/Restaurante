@@ -5,7 +5,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class MapaMesas extends JPanel {
+public class MapaMesas extends JPanel{
     
     private ArrayList<Mesa> mesas;
 
@@ -24,6 +24,9 @@ public class MapaMesas extends JPanel {
     public MapaMesas(int tamanoCuadricula, ArrayList<Mesa> mesas) {
         this.tamanoCuadricula = tamanoCuadricula;
         this.mesas = mesas;
+        setSize(340, 500);
+        System.out.println(getSize());
+        
     }
 
     @Override

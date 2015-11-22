@@ -85,14 +85,19 @@ public class MesaDAO
                 + "FROM mesa "
                 + "NATURAL JOIN reserva "
                 + "WHERE reserva_fecha = '" + fecha + "' AND restaurante_nombre = '" + nombreRestaurante + "'";
-        String query2 = "SELECT *"
+        String query2 = "SELECT * "
                 + "FROM mesa EXCEPT ("+ query + ")"
-                + "ORDER BY mesa_numero;";
+                //+ "WHERE restaurante_nombre = '" + nombreRestaurante + "' ;";
+                + "ORDER BY mesa_numero ";
+                //+ "WHERE restaurante_nombre = '" + nombreRestaurante + "' ;";
+        String query3 = "SELECT * "
+                + "FROM (" + query2 + ") AS foo "
+                + "WHERE restaurante_nombre = '" + nombreRestaurante + "' ;";
         
         try
         {
             Statement st = conexionBD.conexion.createStatement();
-            ResultSet tabla = st.executeQuery(query2);
+            ResultSet tabla = st.executeQuery(query3);
             
             mesas = new ArrayList();
             
