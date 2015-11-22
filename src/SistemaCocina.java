@@ -1,6 +1,6 @@
 
-import Controlador.Servidor_Eventos;
-import Vista.Servidor;
+import Controlador.Cocina_Eventos;
+import Vista.Cocina;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -12,14 +12,14 @@ import Vista.Servidor;
  *
  * @author Camilo Ruiz Casanova
  */
-public class SistemaServidor 
+public class SistemaCocina 
 {
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) 
     {
-       Servidor servidor = new Servidor();
-       Servidor_Eventos servidor_Eventos = new Servidor_Eventos(servidor);
+       Cocina servidor = new Cocina();
+       Cocina_Eventos servidor_Eventos = new Cocina_Eventos(servidor);
     }    
 }

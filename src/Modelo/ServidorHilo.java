@@ -6,7 +6,7 @@
 
 package Modelo;
 
-import Controlador.Servidor_Eventos;
+import Controlador.Cocina_Eventos;
 import java.io.*;
 import java.net.Socket;
 
@@ -17,7 +17,7 @@ import java.net.Socket;
 public class ServidorHilo extends Thread
 {
     private Socket socket = null;
-    private Servidor_Eventos servidor_Eventos = null;
+    private Cocina_Eventos servidor_Eventos = null;
     private int ID = -1;
     private DataInputStream streamIn = null;
     private DataOutputStream streamOut = null;
@@ -27,7 +27,7 @@ public class ServidorHilo extends Thread
      * @param servidor_Eventos servidor
      * @param socket socket del cliente
      */
-    public ServidorHilo(Servidor_Eventos servidor_Eventos, Socket socket)
+    public ServidorHilo(Cocina_Eventos servidor_Eventos, Socket socket)
     {  
         this.servidor_Eventos = servidor_Eventos;  
         this.socket = socket;  

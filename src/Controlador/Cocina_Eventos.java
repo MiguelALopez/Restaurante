@@ -7,7 +7,7 @@
 package Controlador;
 
 import Modelo.ServidorHilo;
-import Vista.Servidor;
+import Vista.Cocina;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -23,9 +23,9 @@ import java.util.logging.Logger;
  *
  * @author Camilo Ruiz Casanova
  */
-public class Servidor_Eventos implements Runnable
+public class Cocina_Eventos implements Runnable
 {
-    private Servidor servidor;
+    private Cocina servidor;
     
     private ServerSocket serverSocket;
     private MulticastSocket multicastSocket;
@@ -38,7 +38,7 @@ public class Servidor_Eventos implements Runnable
     
     private final int port;
     
-    public Servidor_Eventos(final Servidor servidor)
+    public Cocina_Eventos(final Cocina servidor)
     {
         this.clientes = new ArrayList();
         this.MAX_CONEXIONES = 5;
@@ -116,7 +116,7 @@ public class Servidor_Eventos implements Runnable
         } 
         catch (IOException ex) 
         {
-            Logger.getLogger(Servidor_Eventos.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Cocina_Eventos.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -146,7 +146,7 @@ public class Servidor_Eventos implements Runnable
         }
         catch (IOException ex) 
         {
-            Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Cocina.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

@@ -10,12 +10,12 @@ package Vista;
  *
  * @author Camilo Ruiz Casanova
  */
-public class Servidor extends javax.swing.JFrame 
+public class Cocina extends javax.swing.JFrame 
 {
     /**
      * Creates new form Servidor
      */
-    public Servidor() 
+    public Cocina() 
     {
         initComponents();
         
