@@ -7,7 +7,10 @@
 package Modelo;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -62,5 +65,53 @@ public class PedidoDAO
         conexionBD.cerrarConexion();
         
         return exito;
+    }
+    
+    public ArrayList<Pedido> consultarPedidos(String nombre_restaurante)
+    {
+        conexionBD.conectar();
+        
+        ArrayList<Pedido> pedidos = null;
+        
+        String query = "SELECT * FROM pedido "
+                + "WHERE restaurante_nombre = '" + nombre_restaurante + "' AND pedido_estado = 'NUEVO';";        
+        
+        try
+        {
+            Statement st = conexionBD.conexion.createStatement();
+            ResultSet tabla = st.executeQuery(query);
+            
+            pedidos = new ArrayList();
+            
+            while (tabla.next())
+            {
+                pedidos.add(new Pedido(tabla.getString(1), tabla.getString(2), 
+                        tabla.getInt(3), tabla.getString(4), new ArrayList()));               
+            }
+            
+            for (int i = 0; i < pedidos.size(); i++)
+            {
+                String query2 = "SELECT consumicion_id, consumicion_nombre, restaurante_nombre "
+                        + "FROM pedido_consumicion NATURAL JOIN consumicion "
+                        + "WHERE pedido_fecha = '" + pedidos.get(i).getFecha() 
+                        + "' AND mesa_numero = " + pedidos.get(i).getMesa_numero() 
+                        + " AND restaurante_nombre = '" + nombre_restaurante + "';";
+                
+                tabla = st.executeQuery(query2);
+                
+                while (tabla.next())
+                {
+                    pedidos.get(i).getConsumiciones().add(new Consumicion(tabla.getString(1), tabla.getString(2), tabla.getString(3)));                    
+                }
+            }               
+        } 
+        catch (SQLException ex) 
+        {
+            Logger.getLogger(MesaDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        conexionBD.cerrarConexion();
+        
+        return pedidos;
     }
 }
