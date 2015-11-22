@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -47,12 +48,12 @@ public class Cocina_Eventos implements Runnable
     
     private ArrayList<Pedido> pedidos;
     private ArrayList<ArrayList<Consumicion>> preparadas;
+    private ArrayList<String> meseros;
     
     private ServerSocket serverSocket;
     private MulticastSocket multicastSocket;
     private InetAddress inetAddress;
     private Thread thread;
-    private ArrayList<ServidorHilo> meseros;
     
     private final int MAX_CONEXIONES;
     public int numConexiones;
@@ -67,8 +68,10 @@ public class Cocina_Eventos implements Runnable
         
         this.pedidos = new ArrayList();
         this.preparadas = new ArrayList();
+        this.meseros = new ArrayList();
         
-        this.MAX_CONEXIONES = 5;
+        this.MAX_CONEXIONES = 30;
+        this.numConexiones = 0;
         this.meseros = new ArrayList();
         
         cocina.bConectar.addActionListener(
@@ -103,7 +106,39 @@ public class Cocina_Eventos implements Runnable
                 }
         );
         
+        cocina.bPedidoListo.addActionListener(
+                new ActionListener()
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent ae) 
+                    {
+                        pedidoListo();
+                    }
+                }
+        );
+        
+        cocina.bActualizarLista.addActionListener(
+                new ActionListener()
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent ae) 
+                    {
+                        actualizarListaIngredientes();
+                    }
+                }
+        );
+        
         actualizarRestaurantes();
+    }
+    
+    private void actualizarRestaurantes()
+    {
+        ArrayList<Restaurante> restaurantes = this.restauranteDAO.consultarRestaurantes();
+        
+        for (int i = 0; i < restaurantes.size(); i++)
+        {
+            this.cocina.cbRestaurante.addItem(restaurantes.get(i).getNombre());
+        }
     }
     
     public void habilitarPaneles(boolean b)
@@ -116,17 +151,9 @@ public class Cocina_Eventos implements Runnable
         this.cocina.lNoPreparadas.setEnabled(b);
         this.cocina.bPreparar.setEnabled(b);
         this.cocina.bPedidoListo.setEnabled(b);
-    }
-    
-    private void actualizarRestaurantes()
-    {
-        ArrayList<Restaurante> restaurantes = this.restauranteDAO.consultarRestaurantes();
         
-        for (int i = 0; i < restaurantes.size(); i++)
-        {
-            this.cocina.cbRestaurante.addItem(restaurantes.get(i).getNombre());
-        }
-    }
+        actualizarPedidos();
+    }   
     
     public void actualizarPedidos()
     {
@@ -152,46 +179,66 @@ public class Cocina_Eventos implements Runnable
     {
         int p = this.cocina.lPedidos.getSelectedIndex();
         
-        String[] consumiciones = new String[pedidos.get(p).getConsumiciones().size()];
-        
-        for (int i = 0; i < consumiciones.length; i++)
+        if (pedidos.size() > 0)
         {
-            consumiciones[i] = pedidos.get(p).getConsumiciones().get(i).getId() + "-" + pedidos.get(p).getConsumiciones().get(i).getNombre();
-        }
-        
-        this.cocina.lNoPreparadas.setListData(consumiciones);
-        
-        String[] preps = new String[this.preparadas.get(p).size()];
-        
-        for (int i = 0; i < preps.length; i++)
-        {
-            preps[i] = this.preparadas.get(p).get(i).getId() + "-" + this.preparadas.get(p).get(i).getNombre();
-        }
-        
-        this.cocina.lPreparadas.setListData(preps);
-    }
-    
-    public void prepararConsumicion()
-    {
-        int ped = this.cocina.lPedidos.getSelectedIndex();
-        int con = this.cocina.lNoPreparadas.getSelectedIndex();
-        
-        boolean res1 = this.consumicionIngredienteDAO.usarIngredientes(this.pedidos.get(ped).getConsumiciones().get(con));
-        
-        boolean res2 = this.pedidoDAO.pedidoConsumicionPreparado(this.pedidos.get(ped), this.pedidos.get(ped).getConsumiciones().get(con));
-               
-        if (res1 && res2)
-        {
-            this.preparadas.get(ped).add(this.pedidos.get(ped).getConsumiciones().get(con));
-            this.pedidos.get(ped).getConsumiciones().remove(con);
-            verificarIngredientesAlmacen();
-            actualizarConsumiciones();
-            
-            JOptionPane.showMessageDialog(cocina, "Consumicion Preparada.", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
+            if (p == -1)
+            {
+                p = 0;
+            }
+
+            String[] consumiciones = new String[pedidos.get(p).getConsumiciones().size()];
+
+            for (int i = 0; i < consumiciones.length; i++)
+            {
+                consumiciones[i] = pedidos.get(p).getConsumiciones().get(i).getId() + "-" + pedidos.get(p).getConsumiciones().get(i).getNombre();
+            }
+
+            this.cocina.lNoPreparadas.setListData(consumiciones);
+
+            String[] preps = new String[this.preparadas.get(p).size()];
+
+            for (int i = 0; i < preps.length; i++)
+            {
+                preps[i] = this.preparadas.get(p).get(i).getId() + "-" + this.preparadas.get(p).get(i).getNombre();
+            }
+
+            this.cocina.lPreparadas.setListData(preps);
         }
         else
         {
-            JOptionPane.showMessageDialog(cocina, "Error al preparar consumicion.", "Mensaje", JOptionPane.ERROR_MESSAGE);
+            this.cocina.lNoPreparadas.setListData(new Object[0]);
+            this.cocina.lPreparadas.setListData(new Object[0]);
+        }
+    }
+    
+    public void prepararConsumicion()
+    {     
+        if (!this.cocina.lPedidos.isSelectionEmpty() && !this.cocina.lNoPreparadas.isSelectionEmpty())
+        {
+            int ped = this.cocina.lPedidos.getSelectedIndex();
+            int con = this.cocina.lNoPreparadas.getSelectedIndex();
+        
+            boolean res1 = this.consumicionIngredienteDAO.usarIngredientes(this.pedidos.get(ped).getConsumiciones().get(con));
+
+            boolean res2 = this.pedidoDAO.pedidoConsumicionPreparado(this.pedidos.get(ped), this.pedidos.get(ped).getConsumiciones().get(con));
+
+            if (res1 && res2)
+            {
+                this.preparadas.get(ped).add(this.pedidos.get(ped).getConsumiciones().get(con));
+                this.pedidos.get(ped).getConsumiciones().remove(con);
+                verificarIngredientesAlmacen();
+                actualizarConsumiciones();
+
+                JOptionPane.showMessageDialog(cocina, "Consumicion Preparada.", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
+            }
+            else
+            {
+                JOptionPane.showMessageDialog(cocina, "Error al preparar consumicion.", "Mensaje", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        else
+        {
+            JOptionPane.showMessageDialog(cocina, "Debe seleccionar un Pedido y una Consumicion para preparar.", "Mensaje", JOptionPane.WARNING_MESSAGE);
         }
     }
     
@@ -202,7 +249,77 @@ public class Cocina_Eventos implements Runnable
         boolean resultado = this.ingredienteDAO.reponerIngredientes(nombre);
     }
     
+    public void pedidoListo()
+    {
+        if (!this.cocina.lPedidos.isSelectionEmpty())
+        {
+            int ped = this.cocina.lPedidos.getSelectedIndex();
+                
+            if (this.pedidos.get(ped).getConsumiciones().isEmpty())
+            {
+                this.pedidoDAO.pedidoPreparado(this.pedidos.get(ped));
+
+                // aqui codigo para notificar al camarero
+                boolean envio = false;
+
+                for (int i = 0; i < this.meseros.size(); i++)
+                {
+                    StringTokenizer tokens = new StringTokenizer(this.meseros.get(i), "|");
+
+                    String mesero = tokens.nextToken();
+                    String fecha = tokens.nextToken();
+                    int mesa = Integer.parseInt(tokens.nextToken());
+                    String restaurante = tokens.nextToken();
+
+                    if (this.pedidos.get(ped).getFecha().equals(fecha) && (this.pedidos.get(ped).getMesa_numero() == mesa) && this.pedidos.get(ped).getRestaurante_nombre().equals(restaurante))
+                    {
+                        this.enviarDatagramPacket(mesero);
+                        envio = true;
+                        break;
+                    }
+                }
+
+                if (envio)
+                {
+                    JOptionPane.showMessageDialog(cocina, "Pedido Enviado.", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
+                }
+                else
+                {
+                    JOptionPane.showMessageDialog(cocina, "Error al enviar pedido, mesero no encontrado.", "Mensaje", JOptionPane.ERROR_MESSAGE);
+                }
+
+                this.pedidos.remove(ped);
+                this.preparadas.remove(ped);
+                actualizarPedidos();         
+            }
+            else
+            {
+                JOptionPane.showMessageDialog(cocina, "No se han cocinado todas las consumiciones del pedido.", "Mensaje", JOptionPane.WARNING_MESSAGE);
+            }
+        }
+        else
+        {
+            JOptionPane.showMessageDialog(cocina, "No ha seleccionado ningun pedido.", "Mensaje", JOptionPane.WARNING_MESSAGE);
+        }
+    }
     
+    public void actualizarListaIngredientes()
+    {
+        String nombre = (String) this.cocina.cbRestaurante.getSelectedItem();
+        
+        ArrayList<Ingrediente> lista = this.ingredienteDAO.consultarIngredientes(nombre);
+        
+        DefaultTableModel model = (DefaultTableModel) this.cocina.tIngredientes.getModel();
+        model.setRowCount(0);
+        model.setRowCount(lista.size());
+        
+        for (int i = 0; i < lista.size(); i++) 
+        {            
+            model.setValueAt(lista.get(i).getId(), i, 0);
+            model.setValueAt(lista.get(i).getNombre(), i, 1);
+            model.setValueAt(lista.get(i).getCantidad(), i, 2);
+        }
+    }
     
     
     
@@ -229,7 +346,8 @@ public class Cocina_Eventos implements Runnable
             System.out.println("\nServidor iniciado: " + serverSocket);
             
             this.inetAddress = InetAddress.getByName("225.0.0.0");
-            this.multicastSocket = new MulticastSocket();
+            this.multicastSocket = new MulticastSocket(3456);
+            this.multicastSocket.joinGroup(inetAddress);
                       
             start();
             
@@ -285,7 +403,6 @@ public class Cocina_Eventos implements Runnable
     { 
         System.out.println("\nCliente aceptado: " + socket);
         ServidorHilo cliente = new ServidorHilo(this, socket);
-        this.meseros.add(new ServidorHilo(cliente));
         
         try 
         {
@@ -332,4 +449,12 @@ public class Cocina_Eventos implements Runnable
     {
         System.out.println(mensaje);
     }
+    
+    public ArrayList<String> getMeseros() {
+        return meseros;
+    }
+
+    public void setMeseros(ArrayList<String> meseros) {
+        this.meseros = meseros;
+    }   
 }

@@ -50,6 +50,7 @@ public class RealizarPedido extends javax.swing.JFrame
         bPagarNota = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Sistema Pedidos");
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 

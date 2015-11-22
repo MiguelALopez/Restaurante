@@ -87,13 +87,48 @@ public class ConsumicionIngredienteDAO
         return lista;
     }
     
+    public boolean verificarIngredientes(Consumicion consumicion)
+    {
+        conexionBD.conectar();
+        
+        boolean suficiente = true;
+        
+        String query = "SELECT ingrediente_cantidad, consumicion_ingrediente_cantidad "
+                + "FROM ingrediente NATURAL JOIN (SELECT * FROM consumicion_ingrediente "
+                + "WHERE consumicion_id = '" + consumicion.getId() + "' "
+                + "AND restaurante_nombre = '" + consumicion.getRestaurante_nombre() + "') AS tabla;";
+        
+        try
+        {
+            Statement st = conexionBD.conexion.createStatement(); 
+            ResultSet tabla = st.executeQuery(query);
+            
+            while (tabla.next())
+            {
+                if (tabla.getInt(1) - tabla.getInt(2) < 0)
+                {
+                    suficiente = false;
+                    break;
+                }
+            }
+        } 
+        catch (SQLException ex) 
+        {
+            Logger.getLogger(ConsumicionIngredienteDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        conexionBD.cerrarConexion();
+        
+        return suficiente;
+    }
+    
     public boolean usarIngredientes(Consumicion consumicion)
     {
         conexionBD.conectar();
         
         boolean exito = false;
         
-        String query = "SELECT ingrediente_id, restaurante_nombre,ingrediente_cantidad, consumicion_ingrediente_cantidad"
+        String query = "SELECT ingrediente_id, restaurante_nombre,ingrediente_cantidad, consumicion_ingrediente_cantidad "
                 + "FROM ingrediente NATURAL JOIN (SELECT * FROM consumicion_ingrediente "
                 + "WHERE consumicion_id = '" + consumicion.getId() + "' "
                 + "AND restaurante_nombre = '" + consumicion.getRestaurante_nombre() + "') AS tabla;";

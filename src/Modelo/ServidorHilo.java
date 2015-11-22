@@ -9,6 +9,7 @@ package Modelo;
 import Controlador.Cocina_Eventos;
 import java.io.*;
 import java.net.Socket;
+import java.util.StringTokenizer;
 
 /**
  * clase ServidorHilo que representa un hilo de cada cliente
@@ -56,6 +57,11 @@ public class ServidorHilo extends Thread
             {
                 input = streamIn.readUTF();
                 
+                StringTokenizer tokens = new StringTokenizer(input, "|");
+                
+                String lugar = tokens.nextToken();
+                String accion = tokens.nextToken();
+                
                 if (input.equals("Salir"))
                 {
                     streamOut.writeUTF("Chao");
@@ -63,12 +69,16 @@ public class ServidorHilo extends Thread
                     servidor_Eventos.numConexiones--;
                     break;
                 }
-                else if (input.equals("COCINA|PEDIDO"))
+                else if (lugar.equals("COCINA") && accion.equals("PEDIDO"))
                 {
                     this.servidor_Eventos.escribirMensaje("\n"+input);
+                    
+                    String mesero = tokens.nextToken() + "|" + tokens.nextToken() + "|" + tokens.nextToken() + "|" + tokens.nextToken();
+                    this.servidor_Eventos.getMeseros().add(mesero);
+                    
                     this.servidor_Eventos.actualizarPedidos();
                 }
-                else if (input.equals("COCINA|REPONER"))
+                else if (lugar.equals("COCINA") && accion.equals("REPONER"))
                 {
                     this.servidor_Eventos.escribirMensaje("\n"+input);
                     this.servidor_Eventos.verificarIngredientesAlmacen();

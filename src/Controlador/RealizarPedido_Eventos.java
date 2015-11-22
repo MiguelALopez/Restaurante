@@ -8,7 +8,6 @@ package Controlador;
 
 import Modelo.Consumicion;
 import Modelo.ConsumicionDAO;
-import Modelo.ConsumicionIngrediente;
 import Modelo.ConsumicionIngredienteDAO;
 import Modelo.Ingrediente;
 import Modelo.IngredienteDAO;
@@ -51,8 +50,6 @@ public class RealizarPedido_Eventos
     
     private Pedido pedido;
     
-    private String servidorIP;
-    private int servidorPuerto;    
     private Socket socket;
     private MulticastSocket multicastSocket;
     private InetAddress inetAddress;
@@ -247,6 +244,10 @@ public class RealizarPedido_Eventos
                 
                 JOptionPane.showMessageDialog(realizarPedido, mensaje, "Ingredientes", JOptionPane.INFORMATION_MESSAGE);
             }
+            else
+            {
+                JOptionPane.showMessageDialog(realizarPedido, "Error al consultar.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
         else
         {
@@ -254,7 +255,7 @@ public class RealizarPedido_Eventos
 
             if (consumicion != null)
             {
-                boolean suficiente = verificarIngredientes(consumicion);
+                boolean suficiente = this.consumicionIngredienteDAO.verificarIngredientes(consumicion);
                 
                 if (suficiente)
                 {
@@ -273,44 +274,26 @@ public class RealizarPedido_Eventos
                 }
                 else
                 {
-                    String mensaje = "No hay suficientes ingredientes para: " + consumicion.getId() + "-" + consumicion.getNombre();
-                    JOptionPane.showMessageDialog(realizarPedido, mensaje, "Advertencia", JOptionPane.WARNING_MESSAGE);
-                }
-            }
-        }
-    }
-    
-    public boolean verificarIngredientes(Consumicion consumicion)
-    {
-        boolean resultado = true;
-        
-        ArrayList<ConsumicionIngrediente> lista = this.consumicionIngredienteDAO.consultarConsumicionIngredientes(consumicion.getId(), consumicion.getRestaurante_nombre());
-        
-        if (lista != null)
-        {
-            for (int i = 0; i < lista.size(); i++)
-            {
-                Ingrediente ing = this.ingredienteDAO.consultarIngrediente(lista.get(i).getIngrediente_id(), lista.get(i).getRestaurante_nombre());
-                
-                if (ing.getCantidad() - lista.get(i).getCantidad() < 0)
-                {
-                    resultado = false;
-                    
                     try 
                     {
-                        // aqui codigo para avisar al almacen para reponer ingrediente
                         streamOut.writeUTF("COCINA|REPONER");
-                    } 
+                        streamOut.flush();
+                    }
                     catch (IOException ex) 
                     {
                         Logger.getLogger(RealizarPedido_Eventos.class.getName()).log(Level.SEVERE, null, ex);
                     }
+                    
+                    String mensaje = "No hay suficientes ingredientes para: " + consumicion.getId() + "-" + consumicion.getNombre();
+                    JOptionPane.showMessageDialog(realizarPedido, mensaje, "Advertencia", JOptionPane.WARNING_MESSAGE);
                 }
             }
+            else
+            {
+                JOptionPane.showMessageDialog(realizarPedido, "Error al consultar.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
-        
-        return resultado;
-    }
+    }    
     
     public void cancelarPedido()
     {
@@ -328,7 +311,8 @@ public class RealizarPedido_Eventos
         {
             try
             {
-                streamOut.writeUTF("COCINA|PEDIDO");
+                // notificacion al servidor cocina de nuevo pedido
+                streamOut.writeUTF("COCINA|PEDIDO|" + socket.getLocalPort() + "|" + pedido.getFecha() + "|" + pedido.getMesa_numero() + "|" + pedido.getRestaurante_nombre());
                 mesaDAO.modificarEstado(mesa, nombre, "ESPERANDO COMIDA");
             }
             catch (IOException ex)
@@ -342,7 +326,6 @@ public class RealizarPedido_Eventos
             this.realizarPedido.lPedido.setEnabled(false);
             this.realizarPedido.bCancelar.setEnabled(false);
             this.realizarPedido.bRealizarPedido.setEnabled(false);
-            this.realizarPedido.bPedirNota.setEnabled(true);
             
             JOptionPane.showMessageDialog(realizarPedido, "Pedido realizado exitosamente.", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
         }
@@ -350,6 +333,18 @@ public class RealizarPedido_Eventos
         {
             JOptionPane.showMessageDialog(realizarPedido, "Error al realizar el Pedido.", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
         }
+    }
+    
+    public void pedidoListo()
+    {
+        JOptionPane.showMessageDialog(realizarPedido, "Pedido Listo en Cocina.", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
+        
+        int mesa = (Integer) this.realizarPedido.cbMesa.getSelectedItem();
+        String nombre = (String) this.realizarPedido.cbRestaurante.getSelectedItem();
+        
+        this.mesaDAO.modificarEstado(mesa, nombre, "SERVIDOS");
+        
+        this.realizarPedido.bPedirNota.setEnabled(true);
     }
     
     public void pedirNota()
@@ -409,8 +404,8 @@ public class RealizarPedido_Eventos
     public void conectar()
     {
         // conexion con el servidor
-        this.servidorIP = "localhost";
-        this.servidorPuerto = 12345;
+        String servidorIP = "localhost";
+        int servidorPuerto = 12345;
         
         System.out.println("Estableciendo conexion, por favor espere...");
 
@@ -427,6 +422,7 @@ public class RealizarPedido_Eventos
             if (streamIn.readBoolean())
             {
                 System.out.println("\nConectado: " + socket);
+                leerDatos();
                 
                 actualizarMesas();
                 habilitarSeleccionMesa(true);
@@ -516,7 +512,8 @@ public class RealizarPedido_Eventos
                     }
                     catch (IOException ex) 
                     {
-                        Logger.getLogger(RealizarPedido_Eventos.class.getName()).log(Level.SEVERE, null, ex);
+                        break;
+                        //Logger.getLogger(RealizarPedido_Eventos.class.getName()).log(Level.SEVERE, null, ex);
                     }                  
                 }
             }
@@ -535,6 +532,10 @@ public class RealizarPedido_Eventos
                     
                     try
                     {
+                        String id = socket.getLocalPort() + "";
+                        
+                        System.out.println(id);
+                        
                         multicastSocket.receive(packet);
                         
                         byte[] buffer2 = new byte[packet.getLength()];
@@ -542,16 +543,17 @@ public class RealizarPedido_Eventos
                         // Copy the sent data to the second byte array.
                         System.arraycopy(packet.getData(), 0, buffer2, 0, packet.getLength());
                         
-                        String mensaje = new String(buffer2);
+                        String mensaje = new String(buffer2);                        
                         
-                        if (mensaje.charAt(0) == '@')
+                        if (mensaje.equals(id))
                         {
-                            
+                            pedidoListo();
                         }
                     }
                     catch (IOException ex) 
                     {
-                        Logger.getLogger(RealizarPedido_Eventos.class.getName()).log(Level.SEVERE, null, ex);
+                        break;
+                        //Logger.getLogger(RealizarPedido_Eventos.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
             }
