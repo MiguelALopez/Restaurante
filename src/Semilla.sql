@@ -82,7 +82,7 @@ CREATE TABLE pedido_consumicion
     mesa_numero                     INT             NOT NULL,
     restaurante_nombre              VARCHAR(256)    NOT NULL,
     consumicion_id                  VARCHAR(32)     NOT NULL,
-    PRIMARY KEY (pedido_fecha, mesa_numero, restaurante_nombre, consumicion_id),
+    PRIMARY KEY (pedido_fecha, mesa_numero, restaurante_nombre),
     FOREIGN KEY (pedido_fecha, mesa_numero, restaurante_nombre) REFERENCES pedido (pedido_fecha, mesa_numero, restaurante_nombre),
     FOREIGN KEY (consumicion_id, restaurante_nombre) REFERENCES consumicion (consumicion_id, restaurante_nombre)
 );
