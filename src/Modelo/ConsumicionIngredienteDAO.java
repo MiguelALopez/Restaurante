@@ -52,4 +52,37 @@ public class ConsumicionIngredienteDAO
         
         return lista;
     }
+    
+    public ArrayList<Ingrediente> consultarIngredientes(String consumicion_id, String nombre)
+    {
+        conexionBD.conectar();
+        
+        ArrayList<Ingrediente> lista = null;
+        
+        String query = "SELECT ingrediente_id, ingrediente_nombre, ingrediente_cantidad, restaurante_nombre "
+                + "FROM ingrediente NATURAL JOIN (SELECT * FROM consumicion_ingrediente "
+                + "WHERE consumicion_id = '" + consumicion_id + "' AND restaurante_nombre = '" + nombre + "') AS tabla;";
+        
+        try
+        {
+            Statement st = conexionBD.conexion.createStatement();
+            ResultSet tabla = st.executeQuery(query);
+            
+            lista = new ArrayList();
+            
+            while (tabla.next())
+            {
+                lista.add(new Ingrediente(tabla.getString(1), tabla.getString(2),
+                        tabla.getInt(3), tabla.getString(4)));
+            }        
+        } 
+        catch (SQLException ex) 
+        {
+            Logger.getLogger(ConsumicionIngredienteDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        conexionBD.cerrarConexion();        
+        
+        return lista;
+    }
 }

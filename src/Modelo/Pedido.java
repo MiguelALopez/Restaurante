@@ -6,8 +6,8 @@
 
 package Modelo;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
@@ -19,18 +19,22 @@ public class Pedido
     private String fecha;
     private int mesa_numero;
     private String restaurante_nombre;
+    private ArrayList<Consumicion> consumiciones;
 
-    public Pedido(int mesa_numero, String restaurante_nombre) 
+    public Pedido(int mesa_numero, String restaurante_nombre, ArrayList<Consumicion> consumiciones) 
     {        
         this.fecha = new SimpleDateFormat().format(Calendar.getInstance().getTime());
         this.mesa_numero = mesa_numero;
         this.restaurante_nombre = restaurante_nombre;
+        this.consumiciones = consumiciones;
     }
 
-    public Pedido(String fecha, int mesa_numero, String restaurante_nombre) {
+    public Pedido(String fecha, int mesa_numero, String restaurante_nombre, ArrayList<Consumicion> consumiciones) 
+    {
         this.fecha = fecha;
         this.mesa_numero = mesa_numero;
         this.restaurante_nombre = restaurante_nombre;
+        this.consumiciones = consumiciones;
     }
 
     public String getFecha() {
@@ -56,4 +60,12 @@ public class Pedido
     public void setRestaurante_nombre(String restaurante_nombre) {
         this.restaurante_nombre = restaurante_nombre;
     }    
+
+    public ArrayList<Consumicion> getConsumiciones() {
+        return consumiciones;
+    }
+
+    public void setConsumiciones(ArrayList<Consumicion> consumiciones) {
+        this.consumiciones = consumiciones;
+    } 
 }

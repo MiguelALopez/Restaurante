@@ -6,6 +6,7 @@
 
 package Modelo;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -50,5 +51,34 @@ public class MesaDAO
         conexionBD.cerrarConexion();        
         
         return mesas;
+    }
+    
+    public boolean modificarEstado(int mesa, String nombre, String estado)
+    {
+        conexionBD.conectar();
+        
+        boolean exito = false;
+        
+        String query = "UPDATE mesa SET mesa_estado = ? WHERE mesa_numero = ? AND restaurante_nombre = ?;";
+        
+        try
+        {
+            PreparedStatement st = conexionBD.conexion.prepareStatement(query);
+            
+            st.setString(1, estado);
+            st.setInt(2, mesa);
+            st.setString(3, nombre);
+            
+            int resultado = st.executeUpdate();
+            exito = true;
+        } 
+        catch (SQLException ex) 
+        {
+            Logger.getLogger(MesaDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        conexionBD.cerrarConexion();
+        
+        return exito;
     }
 }

@@ -49,6 +49,8 @@ public class RealizarPedido_Eventos
     private PedidoDAO pedidoDAO;
     private ConsumicionIngredienteDAO consumicionIngredienteDAO;
     
+    private ArrayList<Consumicion> consumiciones;
+    
     private String servidorIP;
     private int servidorPuerto;    
     private Socket socket;
@@ -85,7 +87,7 @@ public class RealizarPedido_Eventos
                     @Override
                     public void actionPerformed(ActionEvent ae) 
                     {
-                        habilitarTomarPedido(true);
+                        aceptarMesa();
                     }
                 }
         );
@@ -159,7 +161,17 @@ public class RealizarPedido_Eventos
         {
             this.realizarPedido.cbMesa.addItem(mesas.get(i).getNumero());
         }
-    } 
+    }
+    
+    public void aceptarMesa()
+    {
+        int mesa = (Integer) this.realizarPedido.cbMesa.getSelectedItem();
+        String nombre = (String) this.realizarPedido.cbRestaurante.getSelectedItem();
+        
+        this.mesaDAO.modificarEstado(mesa, nombre, "PIDIENDO");
+        
+        habilitarTomarPedido(true);
+    }
     
     public void habilitarTomarPedido(boolean b)
     {
@@ -171,6 +183,8 @@ public class RealizarPedido_Eventos
         this.realizarPedido.lPedido.setEnabled(b);
         this.realizarPedido.bCancelar.setEnabled(b);
         this.realizarPedido.bRealizarPedido.setEnabled(b);
+        
+        this.consumiciones = new ArrayList();
     }
     
     public void agregarConsumicion()
@@ -178,29 +192,52 @@ public class RealizarPedido_Eventos
         String id = this.realizarPedido.tfConsumicion.getText();
         String nombre = (String) this.realizarPedido.cbRestaurante.getSelectedItem();
         
-        Consumicion consumicion = this.consumicionDAO.consultarConsumicion(id, nombre);
-        
-        if (consumicion != null)
+        if (id.charAt(id.length() - 1) == '?')
         {
-            boolean suficiente = verificarIngredientes(consumicion);
+            String idn = id.substring(0, id.length() - 1);
             
-            if (suficiente)
+            ArrayList<Ingrediente> lista = this.consumicionIngredienteDAO.consultarIngredientes(idn, nombre);
+            
+            if (lista != null)
             {
-                String[] lista = new String[this.realizarPedido.lPedido.getModel().getSize() + 1];
-                        
-                for (int i = 0; i < this.realizarPedido.lPedido.getModel().getSize(); i++)
+                String mensaje = "Ingredientes para " + idn + "\n\n\n";
+                
+                for (int i = 0; i < lista.size(); i++)
                 {
-                    lista[i] = (String) this.realizarPedido.lPedido.getModel().getElementAt(i);
+                    mensaje += (i+1) + ". " + lista.get(i).getNombre() + "  (CODIGO: " + lista.get(i).getId() + ")\n\n";
                 }
-
-                lista[lista.length - 1] = consumicion.getId();
-
-                this.realizarPedido.lPedido.setListData(lista);
+                
+                JOptionPane.showMessageDialog(realizarPedido, mensaje, "Ingredientes", JOptionPane.INFORMATION_MESSAGE);
             }
-            else
+        }
+        else
+        {
+            Consumicion consumicion = this.consumicionDAO.consultarConsumicion(id, nombre);
+
+            if (consumicion != null)
             {
-                String mensaje = "No hay suficientes ingredientes para: " + consumicion.getId() + "-" + consumicion.getNombre();
-                JOptionPane.showMessageDialog(realizarPedido, mensaje, "Advertencia", JOptionPane.WARNING_MESSAGE);
+                boolean suficiente = verificarIngredientes(consumicion);
+
+                if (suficiente)
+                {
+                    String[] lista = new String[this.realizarPedido.lPedido.getModel().getSize() + 1];
+
+                    for (int i = 0; i < this.realizarPedido.lPedido.getModel().getSize(); i++)
+                    {
+                        lista[i] = (String) this.realizarPedido.lPedido.getModel().getElementAt(i);
+                    }
+
+                    lista[lista.length - 1] = consumicion.getId();
+
+                    this.realizarPedido.lPedido.setListData(lista);
+
+                    consumiciones.add(consumicion);
+                }
+                else
+                {
+                    String mensaje = "No hay suficientes ingredientes para: " + consumicion.getId() + "-" + consumicion.getNombre();
+                    JOptionPane.showMessageDialog(realizarPedido, mensaje, "Advertencia", JOptionPane.WARNING_MESSAGE);
+                }
             }
         }
     }
@@ -242,9 +279,7 @@ public class RealizarPedido_Eventos
         int mesa = (Integer) this.realizarPedido.cbMesa.getSelectedItem();
         String nombre = (String) this.realizarPedido.cbRestaurante.getSelectedItem();
         
-        
-        
-        Pedido pedido = new Pedido(mesa, nombre);
+        Pedido pedido = new Pedido(mesa, nombre, this.consumiciones);
         
         boolean resultado = this.pedidoDAO.insetarPedido(pedido);
         
@@ -253,6 +288,8 @@ public class RealizarPedido_Eventos
             try 
             {
                 streamOut.writeUTF("COCINA|PEDIDO");
+                mesaDAO.modificarEstado(mesa, nombre, "ESPERANDO COMIDA");
+                
             }
             catch (IOException ex) 
             {
