@@ -23,6 +23,7 @@ CREATE TABLE reserva
     reserva_fecha                   VARCHAR(64)     NOT NULL,
     reserva_hora                    VARCHAR(8)      NOT NULL,
     reserva_nombre                  VARCHAR(128)    NOT NULL,
+    reserva_numero_personas         INT             NOT NULL,
     mesa_numero                     INT             NOT NULL,
     restaurante_nombre              VARCHAR(256)    NOT NULL,
     PRIMARY KEY (reserva_fecha, mesa_numero, restaurante_nombre),
@@ -102,6 +103,15 @@ INSERT INTO mesa VALUES (7, 15, FALSE, 'LIBRE', 'RESTAURANTE 1');
 INSERT INTO mesa VALUES (8, 15, FALSE, 'LIBRE', 'RESTAURANTE 1');
 INSERT INTO mesa VALUES (9, 15, TRUE, 'LIBRE', 'RESTAURANTE 1');
 INSERT INTO mesa VALUES (10, 20, TRUE, 'LIBRE', 'RESTAURANTE 1');
+
+INSERT INTO reserva VALUES ('21/11/2015', '1200', 'Pepito', 10, 2, 'RESTAURANTE 1');
+INSERT INTO reserva VALUES ('21/11/2015', '1200', 'Pepito', 10, 4, 'RESTAURANTE 1');
+INSERT INTO reserva VALUES ('21/11/2015', '1200', 'Pepito', 10, 7, 'RESTAURANTE 1');
+INSERT INTO reserva VALUES ('21/11/2015', '1200', 'Pepito', 10, 1, 'RESTAURANTE 1');
+INSERT INTO reserva VALUES ('21/11/2015', '1200', 'Pepito', 10, 10, 'RESTAURANTE 1');
+INSERT INTO reserva VALUES ('20/11/2015', '1200', 'Pepito', 10, 3, 'RESTAURANTE 1');
+INSERT INTO reserva VALUES ('20/11/2015', '1200', 'Pepito', 10, 8, 'RESTAURANTE 1');
+INSERT INTO reserva VALUES ('20/11/2015', '1200', 'Pepito', 10, 6, 'RESTAURANTE 1');
 
 INSERT INTO consumicion VALUES ('1000', 'HAMBURGUESA RES', 'RESTAURANTE 1');
 INSERT INTO consumicion VALUES ('1001', 'HAMBURGUESA CERDO', 'RESTAURANTE 1');

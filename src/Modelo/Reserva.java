@@ -4,15 +4,26 @@ public class Reserva {
     private String fecha;
     private String hora;
     private String nombre;
+    private int numero_personas;
     private int mesa_numero;
     private String restaurante_nombre;
 
-    public Reserva(String fecha, String hora, String nombre, int mesa_numero, String restaurante_nombre) {
+    public Reserva(String fecha, String hora, String nombre, int numero_personas, int mesa_numero, String restaurante_nombre) {
         this.fecha = fecha;
         this.hora = hora;
         this.nombre = nombre;
+        this.numero_personas = numero_personas;
         this.mesa_numero = mesa_numero;
         this.restaurante_nombre = restaurante_nombre;
+    }
+    
+    //Getters y Setters
+    public int getNumero_personas() {
+        return numero_personas;
+    }
+
+    public void setNumero_personas(int numero_personas) {
+        this.numero_personas = numero_personas;
     }
 
     public String getFecha() {

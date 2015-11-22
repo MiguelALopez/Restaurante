@@ -12,7 +12,7 @@ public class ReservaDAO {
         conexionBD.conectar();
         boolean exito = false;
         
-        String query = "INSERT INTO reserva(reserva_fecha, reserva_hora, reserva_nombre, mesa_numero, restaurante_nombre) VALUES (?, ?, ?, ?, ?);";
+        String query = "INSERT INTO reserva(reserva_fecha, reserva_hora, reserva_nombre, reserva_numero_personas, mesa_numero, restaurante_nombre) VALUES (?, ?, ?, ?, ?, ?);";
         
         try {
             PreparedStatement st = conexionBD.conexion.prepareStatement(query);
@@ -20,8 +20,9 @@ public class ReservaDAO {
             st.setString(1, reserva.getFecha());
             st.setString(2, reserva.getHora());
             st.setString(3, reserva.getNombre());
-            st.setInt(4, reserva.getMesa_numero());
-            st.setString(5, reserva.getRestaurante_nombre());
+            st.setInt(4, reserva.getNumero_personas());
+            st.setInt(5, reserva.getMesa_numero());
+            st.setString(6, reserva.getRestaurante_nombre());
             
             int resultado = st.executeUpdate();
             exito = true;
@@ -29,6 +30,8 @@ public class ReservaDAO {
         } catch (SQLException ex) {
             Logger.getLogger(ReservaDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        conexionBD.cerrarConexion(); 
         
         return exito;
     }
