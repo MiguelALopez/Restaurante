@@ -18,6 +18,36 @@ public class MesaDAO
 {
     private ConexionBD conexionBD = new ConexionBD();
     
+    public Mesa consultarMesa(String nombreRestaurante, int mesa_numero)
+    {
+        conexionBD.conectar();        
+        Mesa mesa = null;
+        
+        String query = "SELECT * FROM mesa WHERE restaurante_nombre = '"
+                + nombreRestaurante + "' AND mesa_numero = '" + mesa_numero + "';";
+        System.out.println(mesa_numero + " - " + nombreRestaurante);
+        
+        try
+        {
+            Statement st = conexionBD.conexion.createStatement();
+            ResultSet tabla = st.executeQuery(query);            
+            
+            if (tabla.next())
+            {
+                mesa =  new Mesa(tabla.getInt(1), tabla.getInt(2), tabla.getBoolean(3),
+                        tabla.getString(4), tabla.getString(5));
+            }        
+        } 
+        catch (SQLException ex) 
+        {
+            Logger.getLogger(MesaDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        conexionBD.cerrarConexion();        
+        
+        return mesa;
+    }
+    
     public ArrayList<Mesa> consultarMesasRestaurante(String nombreRestaurante)
     {
         conexionBD.conectar();
