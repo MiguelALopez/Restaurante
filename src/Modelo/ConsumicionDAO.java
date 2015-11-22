@@ -36,8 +36,8 @@ public class ConsumicionDAO
             
             if (tabla.next())
             {
-                consumicion = new Consumicion(tabla.getString(1), 
-                        tabla.getString(2), tabla.getString(3));                
+                consumicion = new Consumicion(tabla.getString(1),
+                        tabla.getString(2), tabla.getString(3));
             }
         } 
         catch (SQLException ex) 

@@ -6,6 +6,8 @@
 
 package Modelo;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Camilo Ruiz Casanova
