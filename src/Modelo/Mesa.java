@@ -53,7 +53,5 @@ public class Mesa {
 
     public void setRestaurante_nombre(String restaurante_nombre) {
         this.restaurante_nombre = restaurante_nombre;
-    }
-    
-    
+    } 
 }

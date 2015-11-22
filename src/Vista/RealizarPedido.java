@@ -18,6 +18,9 @@ public class RealizarPedido extends javax.swing.JFrame
     public RealizarPedido() 
     {
         initComponents();
+        
+        this.setLocationRelativeTo(null);
+        this.setVisible(true);
     }
 
     /**
@@ -220,7 +223,6 @@ public class RealizarPedido extends javax.swing.JFrame
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JButton bAceptar;
     public javax.swing.JButton bAgregar;

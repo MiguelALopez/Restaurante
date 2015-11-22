@@ -2,15 +2,9 @@
 import Controlador.Cocina_Eventos;
 import Vista.Cocina;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  *
- * @author Camilo Ruiz Casanova
+ * clase main de la cocina
  */
 public class SistemaCocina 
 {

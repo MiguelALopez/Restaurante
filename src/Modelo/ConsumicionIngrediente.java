@@ -1,14 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 
 package Modelo;
 
 /**
  *
- * @author Camilo Ruiz Casanova
+ * clase que representa una relacion entre una consumicion y un ingrediente
  */
 public class ConsumicionIngrediente 
 {
@@ -54,7 +50,5 @@ public class ConsumicionIngrediente
 
     public void setRestaurante_nombre(String restaurante_nombre) {
         this.restaurante_nombre = restaurante_nombre;
-    }
-    
-    
+    } 
 }

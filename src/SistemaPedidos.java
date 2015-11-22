@@ -2,15 +2,9 @@
 import Controlador.RealizarPedido_Eventos;
 import Vista.RealizarPedido;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  *
- * @author Camilo Ruiz Casanova
+ * clase main de los pedidos
  */
 public class SistemaPedidos 
 {
