@@ -44,7 +44,10 @@ public class Cocina extends javax.swing.JFrame
         jScrollPane1 = new javax.swing.JScrollPane();
         lPedidos = new javax.swing.JList();
         jScrollPane2 = new javax.swing.JScrollPane();
-        lConsumiciones = new javax.swing.JList();
+        lNoPreparadas = new javax.swing.JList();
+        jLabel4 = new javax.swing.JLabel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        lPreparadas = new javax.swing.JList();
         jPanel5 = new javax.swing.JPanel();
         bPreparar = new javax.swing.JButton();
         bPedidoListo = new javax.swing.JButton();
@@ -88,15 +91,21 @@ public class Cocina extends javax.swing.JFrame
 
         jLabel2.setText("Pedidos");
 
-        jLabel3.setText("Consumiciones");
+        jLabel3.setText("Consumiciones No Preparadas");
 
         lPedidos.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         lPedidos.setEnabled(false);
         jScrollPane1.setViewportView(lPedidos);
 
-        lConsumiciones.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        lConsumiciones.setEnabled(false);
-        jScrollPane2.setViewportView(lConsumiciones);
+        lNoPreparadas.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        lNoPreparadas.setEnabled(false);
+        jScrollPane2.setViewportView(lNoPreparadas);
+
+        jLabel4.setText("Consumiciones Preparadas");
+
+        lPreparadas.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        lPreparadas.setEnabled(false);
+        jScrollPane3.setViewportView(lPreparadas);
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -108,23 +117,30 @@ public class Cocina extends javax.swing.JFrame
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel3)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane2)
+                    .addComponent(jLabel4)
+                    .addComponent(jScrollPane3))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(jLabel3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 193, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 104, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1))
+                .addContainerGap())
         );
 
         jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
@@ -183,11 +199,11 @@ public class Cocina extends javax.swing.JFrame
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 479, Short.MAX_VALUE)
+            .addGap(0, 524, Short.MAX_VALUE)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 338, Short.MAX_VALUE)
+            .addGap(0, 381, Short.MAX_VALUE)
         );
 
         tpTabs.addTab("Almacen", jPanel3);
@@ -223,6 +239,7 @@ public class Cocina extends javax.swing.JFrame
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -230,8 +247,10 @@ public class Cocina extends javax.swing.JFrame
     private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    public javax.swing.JList lConsumiciones;
+    private javax.swing.JScrollPane jScrollPane3;
+    public javax.swing.JList lNoPreparadas;
     public javax.swing.JList lPedidos;
+    public javax.swing.JList lPreparadas;
     public javax.swing.JTabbedPane tpTabs;
     // End of variables declaration//GEN-END:variables
 }

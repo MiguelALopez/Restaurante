@@ -68,6 +68,11 @@ public class ServidorHilo extends Thread
                     this.servidor_Eventos.escribirMensaje("\n"+input);
                     this.servidor_Eventos.actualizarPedidos();
                 }
+                else if (input.equals("COCINA|REPONER"))
+                {
+                    this.servidor_Eventos.escribirMensaje("\n"+input);
+                    this.servidor_Eventos.verificarIngredientesAlmacen();
+                }
             } 
             catch (IOException ex) 
             {

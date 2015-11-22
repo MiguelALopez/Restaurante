@@ -6,6 +6,10 @@
 
 package Controlador;
 
+import Modelo.Consumicion;
+import Modelo.ConsumicionIngredienteDAO;
+import Modelo.Ingrediente;
+import Modelo.IngredienteDAO;
 import Modelo.Pedido;
 import Modelo.PedidoDAO;
 import Modelo.Restaurante;
@@ -25,6 +29,7 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -37,8 +42,11 @@ public class Cocina_Eventos implements Runnable
     private Cocina cocina;
     private RestauranteDAO restauranteDAO;
     private PedidoDAO pedidoDAO;
+    private ConsumicionIngredienteDAO consumicionIngredienteDAO;
+    private IngredienteDAO ingredienteDAO;
     
     private ArrayList<Pedido> pedidos;
+    private ArrayList<ArrayList<Consumicion>> preparadas;
     
     private ServerSocket serverSocket;
     private MulticastSocket multicastSocket;
@@ -54,8 +62,11 @@ public class Cocina_Eventos implements Runnable
         this.cocina = cocina;
         this.restauranteDAO = new RestauranteDAO();
         this.pedidoDAO = new PedidoDAO();
+        this.consumicionIngredienteDAO = new ConsumicionIngredienteDAO();
+        this.ingredienteDAO = new IngredienteDAO();
         
         this.pedidos = new ArrayList();
+        this.preparadas = new ArrayList();
         
         this.MAX_CONEXIONES = 5;
         this.meseros = new ArrayList();
@@ -81,7 +92,30 @@ public class Cocina_Eventos implements Runnable
                     }                    
                 });
         
+        cocina.bPreparar.addActionListener(
+                new ActionListener()
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent ae) 
+                    {
+                        prepararConsumicion();
+                    }
+                }
+        );
+        
         actualizarRestaurantes();
+    }
+    
+    public void habilitarPaneles(boolean b)
+    {
+        this.cocina.cbRestaurante.setEnabled(!b);
+        this.cocina.bConectar.setEnabled(!b);
+        
+        this.cocina.tpTabs.setEnabled(b);
+        this.cocina.lPedidos.setEnabled(b);
+        this.cocina.lNoPreparadas.setEnabled(b);
+        this.cocina.bPreparar.setEnabled(b);
+        this.cocina.bPedidoListo.setEnabled(b);
     }
     
     private void actualizarRestaurantes()
@@ -107,6 +141,7 @@ public class Cocina_Eventos implements Runnable
             for (int i = 0; i < lista.length; i++)
             {
                 lista[i] = pedidos.get(i).getMesa_numero() + "-" + pedidos.get(i).getFecha();
+                this.preparadas.add(new ArrayList());
             }
 
             this.cocina.lPedidos.setListData(lista);
@@ -124,19 +159,47 @@ public class Cocina_Eventos implements Runnable
             consumiciones[i] = pedidos.get(p).getConsumiciones().get(i).getId() + "-" + pedidos.get(p).getConsumiciones().get(i).getNombre();
         }
         
-        this.cocina.lConsumiciones.setListData(consumiciones);
+        this.cocina.lNoPreparadas.setListData(consumiciones);
+        
+        String[] preps = new String[this.preparadas.get(p).size()];
+        
+        for (int i = 0; i < preps.length; i++)
+        {
+            preps[i] = this.preparadas.get(p).get(i).getId() + "-" + this.preparadas.get(p).get(i).getNombre();
+        }
+        
+        this.cocina.lPreparadas.setListData(preps);
     }
     
-    public void habilitarPaneles(boolean b)
+    public void prepararConsumicion()
     {
-        this.cocina.cbRestaurante.setEnabled(!b);
-        this.cocina.bConectar.setEnabled(!b);
+        int ped = this.cocina.lPedidos.getSelectedIndex();
+        int con = this.cocina.lNoPreparadas.getSelectedIndex();
         
-        this.cocina.tpTabs.setEnabled(b);
-        this.cocina.lPedidos.setEnabled(b);
-        this.cocina.lConsumiciones.setEnabled(b);
-        this.cocina.bPreparar.setEnabled(b);
-        this.cocina.bPedidoListo.setEnabled(b);
+        boolean res1 = this.consumicionIngredienteDAO.usarIngredientes(this.pedidos.get(ped).getConsumiciones().get(con));
+        
+        boolean res2 = this.pedidoDAO.pedidoConsumicionPreparado(this.pedidos.get(ped), this.pedidos.get(ped).getConsumiciones().get(con));
+               
+        if (res1 && res2)
+        {
+            this.preparadas.get(ped).add(this.pedidos.get(ped).getConsumiciones().get(con));
+            this.pedidos.get(ped).getConsumiciones().remove(con);
+            verificarIngredientesAlmacen();
+            actualizarConsumiciones();
+            
+            JOptionPane.showMessageDialog(cocina, "Consumicion Preparada.", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
+        }
+        else
+        {
+            JOptionPane.showMessageDialog(cocina, "Error al preparar consumicion.", "Mensaje", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    public void verificarIngredientesAlmacen()
+    {
+        String nombre = (String) this.cocina.cbRestaurante.getSelectedItem();
+        
+        boolean resultado = this.ingredienteDAO.reponerIngredientes(nombre);
     }
     
     

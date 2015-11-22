@@ -6,9 +6,11 @@
 
 package Modelo;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,5 +51,49 @@ public class IngredienteDAO
         conexionBD.cerrarConexion();
         
         return ingrediente;
+    }
+    
+    public boolean reponerIngredientes(String nombre_restaurante)
+    {
+        conexionBD.conectar();
+        
+        boolean exito = false;
+        
+        String query = "SELECT ingrediente_id, ingrediente_cantidad "
+                + "FROM ingrediente "
+                + "WHERE restaurante_nombre = '" + nombre_restaurante + "';";
+        
+        String query2 = "UPDATE ingrediente "
+                + "SET ingrediente_cantidad = ? "
+                + "WHERE ingrediente_id = ? "
+                + "AND restaurante_nombre = ?;";
+        
+        try
+        {
+            Statement st = conexionBD.conexion.createStatement();
+            PreparedStatement st2 = conexionBD.conexion.prepareStatement(query2);
+            ResultSet tabla = st.executeQuery(query);
+            
+            while (tabla.next())
+            {
+                if (tabla.getInt(2) <= 0)
+                {
+                    st2.setInt(1, 10);
+                    st2.setString(2, tabla.getString(1));
+                    
+                    int res = st2.executeUpdate();
+                }
+            }
+            
+            exito = true;
+        } 
+        catch (SQLException ex) 
+        {
+            Logger.getLogger(IngredienteDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        conexionBD.cerrarConexion();
+        
+        return exito;
     }
 }

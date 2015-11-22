@@ -114,4 +114,39 @@ public class PedidoDAO
         
         return pedidos;
     }
+    
+    public boolean pedidoConsumicionPreparado(Pedido pedido, Consumicion consumicion)
+    {
+        conexionBD.conectar();
+        
+        boolean exito = false;
+        
+        String query = "UPDATE pedido_consumicion "
+                + "SET pedido_consumicion_estado = ? "
+                + "WHERE pedido_fecha = ? "
+                + "AND mesa_numero = ? "
+                + "AND restaurante_nombre = ?;";
+        
+        try
+        {
+            PreparedStatement st = conexionBD.conexion.prepareStatement(query);
+            
+            st.setString(1, "PREPARADO");
+            st.setString(2, pedido.getFecha());
+            st.setInt(3, pedido.getMesa_numero());
+            st.setString(4, pedido.getRestaurante_nombre());
+                                   
+            int resultado = st.executeUpdate();
+                                    
+            exito = true;
+        } 
+        catch (SQLException ex) 
+        {
+            Logger.getLogger(PedidoDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        conexionBD.cerrarConexion();
+        
+        return exito;
+    }
 }

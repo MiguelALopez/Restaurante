@@ -296,7 +296,15 @@ public class RealizarPedido_Eventos
                 {
                     resultado = false;
                     
-                    // aqui codigo para avisar al almacen para reponer ingrediente
+                    try 
+                    {
+                        // aqui codigo para avisar al almacen para reponer ingrediente
+                        streamOut.writeUTF("COCINA|REPONER");
+                    } 
+                    catch (IOException ex) 
+                    {
+                        Logger.getLogger(RealizarPedido_Eventos.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
         }
