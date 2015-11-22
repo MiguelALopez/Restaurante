@@ -255,7 +255,7 @@ public class RealizarPedido_Eventos
             if (consumicion != null)
             {
                 boolean suficiente = verificarIngredientes(consumicion);
-
+                
                 if (suficiente)
                 {
                     String[] lista = new String[this.realizarPedido.lPedido.getModel().getSize() + 1];

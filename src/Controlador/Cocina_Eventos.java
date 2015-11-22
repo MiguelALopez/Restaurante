@@ -6,8 +6,14 @@
 
 package Controlador;
 
+import Modelo.Pedido;
+import Modelo.PedidoDAO;
+import Modelo.Restaurante;
+import Modelo.RestauranteDAO;
 import Modelo.ServidorHilo;
 import Vista.Cocina;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -16,8 +22,11 @@ import java.net.MulticastSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /**
  *
@@ -26,6 +35,10 @@ import java.util.logging.Logger;
 public class Cocina_Eventos implements Runnable
 {
     private Cocina cocina;
+    private RestauranteDAO restauranteDAO;
+    private PedidoDAO pedidoDAO;
+    
+    private ArrayList<Pedido> pedidos;
     
     private ServerSocket serverSocket;
     private MulticastSocket multicastSocket;
@@ -36,15 +49,115 @@ public class Cocina_Eventos implements Runnable
     private final int MAX_CONEXIONES;
     public int numConexiones;
     
-    private final int port;
-    
     public Cocina_Eventos(final Cocina cocina)
     {
-        this.meseros = new ArrayList();
-        this.MAX_CONEXIONES = 5;
-        this.port = 12345;
-        
         this.cocina = cocina;
+        this.restauranteDAO = new RestauranteDAO();
+        this.pedidoDAO = new PedidoDAO();
+        
+        this.pedidos = new ArrayList();
+        
+        this.MAX_CONEXIONES = 5;
+        this.meseros = new ArrayList();
+        
+        cocina.bConectar.addActionListener(
+                new ActionListener()
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent ae) 
+                    {
+                        conectar();
+                    }
+                }
+        );
+        
+        cocina.lPedidos.addListSelectionListener(
+                new ListSelectionListener()
+                {
+                    @Override
+                    public void valueChanged(ListSelectionEvent lse) 
+                    {
+                        actualizarConsumiciones();
+                    }                    
+                });
+        
+        actualizarRestaurantes();
+    }
+    
+    private void actualizarRestaurantes()
+    {
+        ArrayList<Restaurante> restaurantes = this.restauranteDAO.consultarRestaurantes();
+        
+        for (int i = 0; i < restaurantes.size(); i++)
+        {
+            this.cocina.cbRestaurante.addItem(restaurantes.get(i).getNombre());
+        }
+    }
+    
+    public void actualizarPedidos()
+    {
+        String nombre = (String) this.cocina.cbRestaurante.getSelectedItem();
+        
+        this.pedidos = this.pedidoDAO.consultarPedidos(nombre);
+        
+        if (pedidos != null)
+        {
+            String[] lista = new String[pedidos.size()];
+        
+            for (int i = 0; i < lista.length; i++)
+            {
+                lista[i] = pedidos.get(i).getMesa_numero() + "-" + pedidos.get(i).getFecha();
+            }
+
+            this.cocina.lPedidos.setListData(lista);
+        }        
+    }
+    
+    public void actualizarConsumiciones()
+    {
+        int p = this.cocina.lPedidos.getSelectedIndex();
+        
+        String[] consumiciones = new String[pedidos.get(p).getConsumiciones().size()];
+        
+        for (int i = 0; i < consumiciones.length; i++)
+        {
+            consumiciones[i] = pedidos.get(p).getConsumiciones().get(i).getId() + "-" + pedidos.get(p).getConsumiciones().get(i).getNombre();
+        }
+        
+        this.cocina.lConsumiciones.setListData(consumiciones);
+    }
+    
+    public void habilitarPaneles(boolean b)
+    {
+        this.cocina.cbRestaurante.setEnabled(!b);
+        this.cocina.bConectar.setEnabled(!b);
+        
+        this.cocina.tpTabs.setEnabled(b);
+        this.cocina.lPedidos.setEnabled(b);
+        this.cocina.lConsumiciones.setEnabled(b);
+        this.cocina.bPreparar.setEnabled(b);
+        this.cocina.bPedidoListo.setEnabled(b);
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    public void conectar()
+    {
+        final int port = 12345;
         
         try
         {  
@@ -56,6 +169,8 @@ public class Cocina_Eventos implements Runnable
             this.multicastSocket = new MulticastSocket();
                       
             start();
+            
+            habilitarPaneles(true);
         }
         catch(IOException ioe)
         {  
@@ -63,7 +178,7 @@ public class Cocina_Eventos implements Runnable
         }
     }
     
-    private void start()
+    public void start()
     {
         if (thread == null)
         {
@@ -93,7 +208,7 @@ public class Cocina_Eventos implements Runnable
                 {
                     agregarCliente(incoming);
                     numConexiones++;
-                    out.writeBoolean(true);
+                    out.writeBoolean(true);                 
                 }
             }
             catch(IOException ie)
