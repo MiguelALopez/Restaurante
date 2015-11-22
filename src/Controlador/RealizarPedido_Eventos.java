@@ -125,6 +125,39 @@ public class RealizarPedido_Eventos
                 }
         );
         
+        realizarPedido.bPedirNota.addActionListener(
+                new ActionListener()
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent ae) 
+                    {
+                        pedirNota();
+                    }
+                }
+        );
+        
+        realizarPedido.bImprimirRecibo.addActionListener(
+                new ActionListener()
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent ae) 
+                    {
+                        imprimirRecibo();
+                    }
+                }
+        );
+        
+        realizarPedido.bPagarNota.addActionListener(
+                new ActionListener()
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent ae) 
+                    {
+                        pagarNota();
+                    }
+                }
+        );
+        
         actualizarRestaurantes();
         
         this.realizarPedido.setLocationRelativeTo(null);
@@ -141,16 +174,7 @@ public class RealizarPedido_Eventos
             this.realizarPedido.cbRestaurante.addItem(restaurantes.get(i).getNombre());
         }
     }
-    
-    public void habilitarSeleccionMesa(boolean b)
-    {
-        this.realizarPedido.cbRestaurante.setEnabled(!b);
-        this.realizarPedido.bConectar.setEnabled(!b);
-        
-        this.realizarPedido.cbMesa.setEnabled(b);
-        this.realizarPedido.bAceptar.setEnabled(b);
-    }
-    
+           
     private void actualizarMesas()
     {
         String nombre = (String) this.realizarPedido.cbRestaurante.getSelectedItem();
@@ -161,6 +185,15 @@ public class RealizarPedido_Eventos
         {
             this.realizarPedido.cbMesa.addItem(mesas.get(i).getNumero());
         }
+    }
+    
+    public void habilitarSeleccionMesa(boolean b)
+    {
+        this.realizarPedido.cbRestaurante.setEnabled(!b);
+        this.realizarPedido.bConectar.setEnabled(!b);
+        
+        this.realizarPedido.cbMesa.setEnabled(b);
+        this.realizarPedido.bAceptar.setEnabled(b);       
     }
     
     public void aceptarMesa()
@@ -179,12 +212,14 @@ public class RealizarPedido_Eventos
         this.realizarPedido.bAceptar.setEnabled(!b);
         
         this.realizarPedido.tfConsumicion.setEditable(b);
+        this.realizarPedido.tfConsumicion.setText("");
         this.realizarPedido.bAgregar.setEnabled(b);
         this.realizarPedido.lPedido.setEnabled(b);
         this.realizarPedido.bCancelar.setEnabled(b);
         this.realizarPedido.bRealizarPedido.setEnabled(b);
         
         this.consumiciones = new ArrayList();
+        this.realizarPedido.lPedido.setListData(new Object[0]);
     }
     
     public void agregarConsumicion()
@@ -268,10 +303,7 @@ public class RealizarPedido_Eventos
     
     public void cancelarPedido()
     {
-        habilitarTomarPedido(false);
-        
-        this.realizarPedido.tfConsumicion.setText("");
-        this.realizarPedido.lPedido.setListData(new Object[0]);
+        habilitarTomarPedido(false);       
     }
     
     public void realizarPedido()
@@ -285,16 +317,23 @@ public class RealizarPedido_Eventos
         
         if (resultado)
         {
-            try 
+            try
             {
                 streamOut.writeUTF("COCINA|PEDIDO");
                 mesaDAO.modificarEstado(mesa, nombre, "ESPERANDO COMIDA");
-                
             }
-            catch (IOException ex) 
+            catch (IOException ex)
             {
                 Logger.getLogger(RealizarPedido_Eventos.class.getName()).log(Level.SEVERE, null, ex);
             }
+            
+            this.realizarPedido.tfConsumicion.setEditable(false);
+            this.realizarPedido.tfConsumicion.setText("");
+            this.realizarPedido.bAgregar.setEnabled(false);
+            this.realizarPedido.lPedido.setEnabled(false);
+            this.realizarPedido.bCancelar.setEnabled(false);
+            this.realizarPedido.bRealizarPedido.setEnabled(false);
+            this.realizarPedido.bPedirNota.setEnabled(true);
             
             JOptionPane.showMessageDialog(realizarPedido, "Pedido realizado exitosamente.", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
         }
@@ -304,21 +343,58 @@ public class RealizarPedido_Eventos
         }
     }
     
+    public void pedirNota()
+    {
+        this.realizarPedido.bPedirNota.setEnabled(false);        
+        
+        int mesa = (Integer) this.realizarPedido.cbMesa.getSelectedItem();
+        String nombre = (String) this.realizarPedido.cbRestaurante.getSelectedItem();
+        
+        this.mesaDAO.modificarEstado(mesa, nombre, "ESPERANDO CUENTA");
+        
+        JOptionPane.showMessageDialog(realizarPedido, "Nota pedida.", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
+        
+        this.realizarPedido.bImprimirRecibo.setEnabled(true);
+    }
+    
+    public void imprimirRecibo()
+    {
+        this.realizarPedido.bImprimirRecibo.setEnabled(false);
+        
+        int mesa = (Integer) this.realizarPedido.cbMesa.getSelectedItem();
+        String nombre = (String) this.realizarPedido.cbRestaurante.getSelectedItem();
+        
+        this.mesaDAO.modificarEstado(mesa, nombre, "PAGANDO");
+        
+        String mensaje = "Cuenta del Pedido\n\n\n";
+        
+        for (int i = 0; i < this.consumiciones.size(); i++)
+        {
+            mensaje += (i+1) + ". " + this.consumiciones.get(i).getNombre() + " - (CODIGO: " + this.consumiciones.get(i).getId() + ")\n\n";
+        }
+        
+        JOptionPane.showMessageDialog(realizarPedido, mensaje, "Cuenta del Pedido", JOptionPane.INFORMATION_MESSAGE);        
+        
+        this.realizarPedido.bPagarNota.setEnabled(true);
+    }
+    
+    public void pagarNota()
+    {
+        this.realizarPedido.bPagarNota.setEnabled(false);
+        
+        int mesa = (Integer) this.realizarPedido.cbMesa.getSelectedItem();
+        String nombre = (String) this.realizarPedido.cbRestaurante.getSelectedItem();
+        
+        this.mesaDAO.modificarEstado(mesa, nombre, "LIBRE");
+        
+        JOptionPane.showMessageDialog(realizarPedido, "Cuenta Pagada.", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
+        
+        habilitarTomarPedido(false);
+    }
     
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    //********************* conexion con el servidor    
     
     // conexion con el servidor
     public void conectar()
