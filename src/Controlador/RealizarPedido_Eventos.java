@@ -173,7 +173,12 @@ public class RealizarPedido_Eventos
         
         for (int i = 0; i < mesas.size(); i++)
         {
-            this.realizarPedido.cbMesa.addItem(mesas.get(i).getNumero());
+            if (!mesas.get(i).getEstado().equals("PIDIENDO") && !mesas.get(i).getEstado().equals("ESPERANDO COMIDA")
+                    && !mesas.get(i).getEstado().equals("SERVIDOS") && !mesas.get(i).getEstado().equals("ESPERANDO CUENTA")
+                    && !mesas.get(i).getEstado().equals("PAGANDO"))
+            {
+                this.realizarPedido.cbMesa.addItem(mesas.get(i).getNumero());
+            }            
         }
     }
     

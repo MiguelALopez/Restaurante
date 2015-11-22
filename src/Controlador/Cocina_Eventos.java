@@ -155,7 +155,28 @@ public class Cocina_Eventos implements Runnable
     {
         String nombre = (String) this.cocina.cbRestaurante.getSelectedItem();
         
-        this.pedidos = this.pedidoDAO.consultarPedidos(nombre);
+        ArrayList<Pedido> peds = this.pedidoDAO.consultarPedidos(nombre);
+        
+        if (peds != null)
+        {
+            for (int i = 0; i < peds.size(); i++)
+            {
+                boolean esta = false;
+                
+                for (int j = 0; j < pedidos.size(); j++)
+                {
+                    if (peds.get(i).getFecha().equals(pedidos.get(j).getFecha()) && peds.get(i).getMesa_numero() == pedidos.get(j).getMesa_numero() && peds.get(i).getRestaurante_nombre().equals(pedidos.get(j).getRestaurante_nombre()))
+                    {
+                        esta = true;
+                    }
+                }
+                
+                if (!esta)
+                {
+                    this.pedidos.add(peds.get(i));
+                }
+            }
+        }
         
         if (pedidos != null)
         {
@@ -168,7 +189,7 @@ public class Cocina_Eventos implements Runnable
             }
 
             this.cocina.lPedidos.setListData(lista);
-        }        
+        }
     }
     
     public void actualizarConsumiciones()
