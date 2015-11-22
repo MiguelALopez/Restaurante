@@ -54,6 +54,7 @@ DROP TABLE IF EXISTS pedido CASCADE;
 CREATE TABLE pedido
 (
     pedido_fecha                    VARCHAR(32)     NOT NULL,
+    pedido_estado                   VARCHAR(32)     NOT NULL,
     mesa_numero                     INT             NOT NULL,
     restaurante_nombre              VARCHAR(256)    NOT NULL,
     PRIMARY KEY (pedido_fecha, mesa_numero, restaurante_nombre),
@@ -75,6 +76,7 @@ CREATE TABLE consumicion_ingrediente
 DROP TABLE IF EXISTS pedido_consumicion CASCADE;
 CREATE TABLE pedido_consumicion
 (
+    pedido_consumicion_estado       VARCHAR(32)     NOT NULL,
     pedido_fecha                    VARCHAR(32)     NOT NULL,
     mesa_numero                     INT             NOT NULL,
     restaurante_nombre              VARCHAR(256)    NOT NULL,

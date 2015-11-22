@@ -17,6 +17,7 @@ import java.util.Calendar;
 public class Pedido 
 {
     private String fecha;
+    private String estado;
     private int mesa_numero;
     private String restaurante_nombre;
     private ArrayList<Consumicion> consumiciones;
@@ -24,14 +25,16 @@ public class Pedido
     public Pedido(int mesa_numero, String restaurante_nombre, ArrayList<Consumicion> consumiciones) 
     {        
         this.fecha = new SimpleDateFormat().format(Calendar.getInstance().getTime());
+        this.estado = "NUEVO";
         this.mesa_numero = mesa_numero;
         this.restaurante_nombre = restaurante_nombre;
         this.consumiciones = consumiciones;
     }
 
-    public Pedido(String fecha, int mesa_numero, String restaurante_nombre, ArrayList<Consumicion> consumiciones) 
+    public Pedido(String fecha, String estado, int mesa_numero, String restaurante_nombre, ArrayList<Consumicion> consumiciones) 
     {
         this.fecha = fecha;
+        this.estado = estado;
         this.mesa_numero = mesa_numero;
         this.restaurante_nombre = restaurante_nombre;
         this.consumiciones = consumiciones;
@@ -44,6 +47,14 @@ public class Pedido
     public void setFecha(String fecha) {
         this.fecha = fecha;
     }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }    
 
     public int getMesa_numero() {
         return mesa_numero;

@@ -24,17 +24,18 @@ public class PedidoDAO
         conexionBD.conectar();
         boolean exito = false;
         
-        String query = "INSERT INTO pedido (pedido_fecha, mesa_numero, restaurante_nombre) VALUES (?, ?, ?);";
+        String query = "INSERT INTO pedido (pedido_fecha, pedido_estado, mesa_numero, restaurante_nombre) VALUES (?, ?, ?, ?);";
         String query2 = "INSERT INTO pedido_consumicion "
-                + "(pedido_fecha, mesa_numero, restaurante_nombre, consumicion_id) VALUES (?, ?, ?, ?);";
+                + "(pedido_consumicion_estado, pedido_fecha, mesa_numero, restaurante_nombre, consumicion_id) VALUES (?, ?, ?, ?, ?);";
         
         try
         {
             PreparedStatement st = conexionBD.conexion.prepareStatement(query);
             
             st.setString(1, pedido.getFecha());
-            st.setInt(2, pedido.getMesa_numero());
-            st.setString(3, pedido.getRestaurante_nombre());
+            st.setString(2, pedido.getEstado());
+            st.setInt(3, pedido.getMesa_numero());
+            st.setString(4, pedido.getRestaurante_nombre());
                                    
             int resultado = st.executeUpdate();
             
@@ -42,10 +43,11 @@ public class PedidoDAO
             
             for (int i = 0; i < pedido.getConsumiciones().size(); i++)
             {
-                st.setString(1, pedido.getFecha());
-                st.setInt(2, pedido.getMesa_numero());
-                st.setString(3, pedido.getRestaurante_nombre());
-                st.setString(4, pedido.getConsumiciones().get(i).getId());
+                st.setString(1, "NO PREPARADO");
+                st.setString(2, pedido.getFecha());
+                st.setInt(3, pedido.getMesa_numero());
+                st.setString(4, pedido.getRestaurante_nombre());
+                st.setString(5, pedido.getConsumiciones().get(i).getId());
                 
                 resultado = st.executeUpdate();
             }

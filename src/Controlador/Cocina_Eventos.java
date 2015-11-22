@@ -25,32 +25,32 @@ import java.util.logging.Logger;
  */
 public class Cocina_Eventos implements Runnable
 {
-    private Cocina servidor;
+    private Cocina cocina;
     
     private ServerSocket serverSocket;
     private MulticastSocket multicastSocket;
     private InetAddress inetAddress;
     private Thread thread;
-    private ArrayList<ServidorHilo> clientes;
+    private ArrayList<ServidorHilo> meseros;
     
     private final int MAX_CONEXIONES;
     public int numConexiones;
     
     private final int port;
     
-    public Cocina_Eventos(final Cocina servidor)
+    public Cocina_Eventos(final Cocina cocina)
     {
-        this.clientes = new ArrayList();
+        this.meseros = new ArrayList();
         this.MAX_CONEXIONES = 5;
         this.port = 12345;
         
-        this.servidor = servidor;
+        this.cocina = cocina;
         
         try
         {  
-            this.servidor.taNotificaciones.append("Conenctandose al puerto " + port + ", por favor espere...");
+            System.out.println("Conenctandose al puerto " + port + ", por favor espere...");
             this.serverSocket = new ServerSocket(port);
-            this.servidor.taNotificaciones.append("\nServidor iniciado: " + serverSocket);
+            System.out.println("\nServidor iniciado: " + serverSocket);
             
             this.inetAddress = InetAddress.getByName("225.0.0.0");
             this.multicastSocket = new MulticastSocket();
@@ -79,7 +79,7 @@ public class Cocina_Eventos implements Runnable
         {  
             try
             {
-                this.servidor.taNotificaciones.append("\nEsperando por un cliente...");
+                System.out.println("\nEsperando por un cliente...");
                 
                 Socket incoming = serverSocket.accept();
                 DataOutputStream out = new DataOutputStream(incoming.getOutputStream());
@@ -87,7 +87,7 @@ public class Cocina_Eventos implements Runnable
                 if (numConexiones >= MAX_CONEXIONES)
                 {
                     out.writeBoolean(false);
-                    this.servidor.taNotificaciones.append("\nConexion rechazada (servidor lleno).");
+                    System.out.println("\nConexion rechazada (cocina lleno).");
                 }
                 else
                 {
@@ -105,9 +105,9 @@ public class Cocina_Eventos implements Runnable
     
     public void agregarCliente(Socket socket)
     { 
-        this.servidor.taNotificaciones.append("\nCliente aceptado: " + socket);
+        System.out.println("\nCliente aceptado: " + socket);
         ServidorHilo cliente = new ServidorHilo(this, socket);
-        this.clientes.add(new ServidorHilo(cliente));
+        this.meseros.add(new ServidorHilo(cliente));
         
         try 
         {
@@ -152,6 +152,6 @@ public class Cocina_Eventos implements Runnable
     
     public void escribirMensaje(String mensaje)
     {
-        this.servidor.taNotificaciones.append(mensaje);
+        System.out.println(mensaje);
     }
 }

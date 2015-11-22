@@ -49,7 +49,7 @@ public class RealizarPedido_Eventos
     private PedidoDAO pedidoDAO;
     private ConsumicionIngredienteDAO consumicionIngredienteDAO;
     
-    private ArrayList<Consumicion> consumiciones;
+    private Pedido pedido;
     
     private String servidorIP;
     private int servidorPuerto;    
@@ -218,7 +218,10 @@ public class RealizarPedido_Eventos
         this.realizarPedido.bCancelar.setEnabled(b);
         this.realizarPedido.bRealizarPedido.setEnabled(b);
         
-        this.consumiciones = new ArrayList();
+        int mesa = (Integer) this.realizarPedido.cbMesa.getSelectedItem();
+        String nombre = (String) this.realizarPedido.cbRestaurante.getSelectedItem();
+        
+        this.pedido = new Pedido(mesa, nombre, new ArrayList());
         this.realizarPedido.lPedido.setListData(new Object[0]);
     }
     
@@ -266,7 +269,7 @@ public class RealizarPedido_Eventos
 
                     this.realizarPedido.lPedido.setListData(lista);
 
-                    consumiciones.add(consumicion);
+                    pedido.getConsumiciones().add(consumicion);
                 }
                 else
                 {
@@ -311,9 +314,7 @@ public class RealizarPedido_Eventos
         int mesa = (Integer) this.realizarPedido.cbMesa.getSelectedItem();
         String nombre = (String) this.realizarPedido.cbRestaurante.getSelectedItem();
         
-        Pedido pedido = new Pedido(mesa, nombre, this.consumiciones);
-        
-        boolean resultado = this.pedidoDAO.insetarPedido(pedido);
+        boolean resultado = this.pedidoDAO.insetarPedido(this.pedido);
         
         if (resultado)
         {
@@ -368,9 +369,9 @@ public class RealizarPedido_Eventos
         
         String mensaje = "Cuenta del Pedido\n\n\n";
         
-        for (int i = 0; i < this.consumiciones.size(); i++)
+        for (int i = 0; i < this.pedido.getConsumiciones().size(); i++)
         {
-            mensaje += (i+1) + ". " + this.consumiciones.get(i).getNombre() + " - (CODIGO: " + this.consumiciones.get(i).getId() + ")\n\n";
+            mensaje += (i+1) + ". " + this.pedido.getConsumiciones().get(i).getNombre() + " - (CODIGO: " + this.pedido.getConsumiciones().get(i).getId() + ")\n\n";
         }
         
         JOptionPane.showMessageDialog(realizarPedido, mensaje, "Cuenta del Pedido", JOptionPane.INFORMATION_MESSAGE);        
