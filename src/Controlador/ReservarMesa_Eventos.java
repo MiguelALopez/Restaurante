@@ -38,24 +38,30 @@ public final class ReservarMesa_Eventos
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        if (reservarMesa.lRestaurantes.getSelectedValue() != null) {
-                            disponibilidadMesas(reservarMesa.lRestaurantes.getSelectedValue().toString(),
-                                reservarMesa.tfFecha.getText());
-                        }else{
+                        if (reservarMesa.lRestaurantes.getSelectedValue() == null) {
                             JOptionPane.showMessageDialog(null, "Seleccione un restaurante por favor");
-                        }
-                        
-                                                
+                        }else if(reservarMesa.tfFecha.getText().isEmpty()){
+                            JOptionPane.showMessageDialog(null, "Por favor inserte una fecha");
+                        }else if(reservarMesa.tfHora.getText().isEmpty()){
+                            JOptionPane.showMessageDialog(null, "Pof favor ingrese la hora");
+                        }else{
+                            disponibilidadMesas(reservarMesa.lRestaurantes.getSelectedValue().toString(),
+                                reservarMesa.tfFecha.getText());                            
+                        }                                                
                     }
                 });
         this.reservarMesa.bReservar.addActionListener(
                 new ActionListener() {
                     @Override
-                    public void actionPerformed(ActionEvent e) {                     
+                    public void actionPerformed(ActionEvent e){
                         if (reservarMesa.lRestaurantes.getSelectedValue() == null) {
                             JOptionPane.showMessageDialog(null, "Seleccione un restaurante por favor");
                         }else if(reservarMesa.comboItem.getItemCount() == 0){
                             JOptionPane.showMessageDialog(null, "No hay mesas disponibles");
+                        }else if(reservarMesa.tfNombre.getText().isEmpty()){
+                            JOptionPane.showMessageDialog(null, "Por favor ingrese un nombre");
+                        }else if(Integer.parseInt(reservarMesa.tfNoPersona.getText()) < 1){
+                            JOptionPane.showMessageDialog(null, "Por favor digite un numero valido");
                         }else{
                             System.out.println(reservarMesa.comboItem.getComponentCount());
                             String fecha = reservarMesa.tfFecha.getText();
@@ -68,10 +74,23 @@ public final class ReservarMesa_Eventos
                             boolean exito = crearReserva(fecha, hora, nombre, numero_personas, mesa_numero, restaurante_nombre);
                             if (exito) {
                                 JOptionPane.showMessageDialog(null, "Exito al crear reserva");
+                                disponibilidadMesas(restaurante_nombre, fecha);
                             }else{
                                 JOptionPane.showMessageDialog(null, "Error al crear reserva");
                             }
                         }
+                    }
+                });
+        this.reservarMesa.bCancelar.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        reservarMesa.tfFecha.setText("");
+                        reservarMesa.tfHora.setText("");
+                        reservarMesa.tfNoPersona.setText("");
+                        reservarMesa.tfNombre.setText("");
+                        reservarMesa.panelMesas.removeAll();
+                        reservarMesa.comboItem.removeAllItems();
                     }
                 });
 
@@ -97,6 +116,7 @@ public final class ReservarMesa_Eventos
         reservarMesa.gridLayoutMesas.setHgap(10);
         reservarMesa.gridLayoutMesas.setVgap(10);
         reservarMesa.comboItem.removeAllItems();
+        reservarMesa.panelMesas.removeAll();
         for (int i = 0; i < mesas.size(); i++) {
             reservarMesa.panelMesas.add(reservarMesa.generaTexto(mesas.get(i).getNumero(),
                     mesas.get(i).isFumador(),
@@ -106,7 +126,15 @@ public final class ReservarMesa_Eventos
     }
     
     public boolean crearReserva(String fecha, String hora, String nombre, int numero_personas, int mesa_numero, String restaurante_nombre){
-        Reserva reserva = new Reserva(fecha, hora, nombre, numero_personas, mesa_numero, restaurante_nombre);
-        return reservaDAO.insertarReserva(reserva);
+        boolean exito = false;
+        Mesa mesa = mesaDAO.consultarMesa(restaurante_nombre, mesa_numero);
+        if(mesa.getCapacidad() >= numero_personas){
+            Reserva reserva = new Reserva(fecha, hora, nombre, numero_personas, mesa_numero, restaurante_nombre);
+            exito = reservaDAO.insertarReserva(reserva);
+        }else{
+            JOptionPane.showMessageDialog(null, "La capacidad de la mesa no es suficiente");
+        }
+        
+        return exito;
     }
 }
